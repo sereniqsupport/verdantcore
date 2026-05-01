@@ -41,6 +41,7 @@ export default function Homepage() {
             <a href="#industries">Industries</a>
             <a href="/contact">Contact</a>
             <a href="/contact">Contact</a>
+            <a href="/contact">Contact</a>
           </nav>
 
           <a href="/contact" className="rounded-full bg-[#8ba56d] px-5 py-2.5 text-sm font-semibold text-white">
