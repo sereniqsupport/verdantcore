@@ -39,10 +39,10 @@ export default function Homepage() {
             <a href="#services">Services</a>
             <a href="#why">Why Eco Cleaning</a>
             <a href="#industries">Industries</a>
-            <a href="#contact">Contact</a>
+            <a href="/contact">Contact</a>
           </nav>
 
-          <a href="#contact" className="rounded-full bg-[#8ba56d] px-5 py-2.5 text-sm font-semibold text-white">
+          <a href="/contact" className="rounded-full bg-[#8ba56d] px-5 py-2.5 text-sm font-semibold text-white">
             Get a Quote
           </a>
         </div>
@@ -67,7 +67,7 @@ export default function Homepage() {
               Premium eco-conscious cleaning solutions designed for healthier, high-performing workspaces.
             </p>
             <div className="mt-9 flex flex-wrap gap-4">
-              <a href="#contact" className="rounded-full bg-[#637f4e] px-7 py-4 text-sm font-bold text-white shadow-xl">
+              <a href="/contact" className="rounded-full bg-[#637f4e] px-7 py-4 text-sm font-bold text-white shadow-xl">
                 Get a Quote
               </a>
               <a href="#services" className="rounded-full border border-[#637f4e]/50 bg-white/50 px-7 py-4 text-sm font-bold text-[#10281d]">
@@ -113,7 +113,7 @@ export default function Homepage() {
             <p className="mt-6 max-w-xl text-lg leading-8 text-[#485448]">
               At VerdantCore, we believe clean spaces create stronger, healthier and more productive environments. Our mission is to deliver exceptional cleaning services using sustainable products and intelligent systems that care for people and the planet.
             </p>
-            <a href="#contact" className="mt-8 inline-flex rounded-full bg-[#637f4e] px-6 py-3 text-sm font-bold text-white">
+            <a href="/contact" className="mt-8 inline-flex rounded-full bg-[#637f4e] px-6 py-3 text-sm font-bold text-white">
               Learn More About Us
             </a>
           </div>
@@ -129,7 +129,7 @@ export default function Homepage() {
                 Cleaning Solutions<br />Tailored to You
               </h2>
             </div>
-            <a className="hidden rounded-full border border-[#637f4e]/30 px-5 py-3 text-sm font-bold text-[#637f4e] md:block" href="#contact">
+            <a className="hidden rounded-full border border-[#637f4e]/30 px-5 py-3 text-sm font-bold text-[#637f4e] md:block" href="/contact">
               View All Services
             </a>
           </div>
@@ -142,7 +142,7 @@ export default function Homepage() {
                   <div className="-mt-12 mb-5 flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-[#f5f7f0] text-2xl shadow-lg">♧</div>
                   <h3 className="text-lg font-bold text-[#10281d]">{service.title}</h3>
                   <p className="mt-3 min-h-20 text-sm leading-6 text-[#5b665b]">{service.text}</p>
-                  <a href="#contact" className="mt-5 inline-block text-sm font-bold text-[#637f4e]">Learn More ○</a>
+                  <a href="/contact" className="mt-5 inline-block text-sm font-bold text-[#637f4e]">Learn More ○</a>
                 </div>
               </article>
             ))}
@@ -229,7 +229,7 @@ export default function Homepage() {
             <h2 className="font-serif text-4xl tracking-[-0.03em]">Ready to Elevate Your Workspace?</h2>
             <p className="mt-3 max-w-xl text-white/70">Let’s create a cleaner, healthier and more sustainable environment together.</p>
           </div>
-          <a href="mailto:hello@verdantcore.com" className="rounded-full bg-[#8ba56d] px-8 py-4 text-sm font-bold text-white shadow-xl">
+          <a href="/contact" className="rounded-full bg-[#8ba56d] px-8 py-4 text-sm font-bold text-white shadow-xl">
             Get a Free Quote
           </a>
         </div>
