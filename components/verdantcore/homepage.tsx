@@ -67,6 +67,8 @@ export default function Homepage() {
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-[#344336]">
               Premium eco-conscious cleaning solutions designed for healthier, high-performing workspaces.
+
+            <span class="block mt-4 text-sm text-[#6b766c]">Typical plans range from –Premium eco-conscious cleaning solutions designed for healthier, high-performing workspaces.,200/month depending on office size and frequency.</span>
             </p>
             <div className="mt-9 flex flex-wrap gap-4">
               <a href="/contact" className="rounded-full bg-[#637f4e] px-7 py-4 text-sm font-bold text-white shadow-xl">
