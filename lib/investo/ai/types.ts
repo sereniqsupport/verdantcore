@@ -1,13 +1,27 @@
+export type InvestoAIProvider =
+  | "openai"
+  | "anthropic";
+
 export type InvestoModelPurpose =
-  | "research"
+  | "company_research"
+  | "financial_analysis"
+  | "valuation"
+  | "portfolio_analysis"
   | "risk_review"
+  | "thesis_challenge"
   | "investment_committee"
   | "classification"
-  | "summary";
+  | "summary"
+  | "system_health";
 
 export type InvestoModelSelection = {
+  provider: InvestoAIProvider;
   model: string;
   reasoningEffort: "low" | "medium" | "high";
+  role:
+    | "primary_analysis"
+    | "independent_review"
+    | "final_synthesis";
 };
 
 export type InvestoAgentEvidence = {
@@ -21,8 +35,19 @@ export type InvestoAgentEvidence = {
 
 export type InvestoAgentResult<T> = {
   agentName: string;
+  provider: InvestoAIProvider;
   model: string;
   promptVersion: string;
   output: T;
   evidence: InvestoAgentEvidence[];
+};
+
+export type InvestoDualReviewResult = {
+  primary: InvestoAgentResult<string>;
+  independentReview: InvestoAgentResult<string>;
+  agreementStatus:
+    | "agreement_not_yet_assessed"
+    | "material_agreement"
+    | "qualified_agreement"
+    | "material_disagreement";
 };

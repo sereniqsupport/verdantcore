@@ -1,18 +1,35 @@
 import "server-only";
 
 import OpenAI from "openai";
-import { requireOpenAIConfiguration } from "@/lib/investo/ai/config";
+import Anthropic from "@anthropic-ai/sdk";
+import {
+  requireAnthropicConfiguration,
+  requireOpenAIConfiguration,
+} from "@/lib/investo/ai/config";
 
-let client: OpenAI | null = null;
+let openAIClient: OpenAI | null = null;
+let anthropicClient: Anthropic | null = null;
 
 export function getInvestoOpenAIClient() {
   const { apiKey } = requireOpenAIConfiguration();
 
-  if (!client) {
-    client = new OpenAI({
+  if (!openAIClient) {
+    openAIClient = new OpenAI({
       apiKey,
     });
   }
 
-  return client;
+  return openAIClient;
+}
+
+export function getInvestoAnthropicClient() {
+  const { apiKey } = requireAnthropicConfiguration();
+
+  if (!anthropicClient) {
+    anthropicClient = new Anthropic({
+      apiKey,
+    });
+  }
+
+  return anthropicClient;
 }

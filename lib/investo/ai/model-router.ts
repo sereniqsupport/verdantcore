@@ -1,6 +1,6 @@
 import {
-  INVESTO_DEEP_REVIEW_MODEL,
-  INVESTO_PRIMARY_MODEL,
+  INVESTO_ANTHROPIC_MODEL,
+  INVESTO_OPENAI_MODEL,
 } from "@/lib/investo/ai/config";
 import type {
   InvestoModelPurpose,
@@ -11,28 +11,47 @@ export function selectInvestoModel(
   purpose: InvestoModelPurpose,
 ): InvestoModelSelection {
   switch (purpose) {
-    case "investment_committee":
+    case "company_research":
+    case "financial_analysis":
+    case "valuation":
+    case "portfolio_analysis":
       return {
-        model: INVESTO_DEEP_REVIEW_MODEL,
+        provider: "openai",
+        model: INVESTO_OPENAI_MODEL,
         reasoningEffort: "high",
+        role: "primary_analysis",
       };
 
-    case "research":
     case "risk_review":
+    case "thesis_challenge":
       return {
-        model: INVESTO_PRIMARY_MODEL,
+        provider: "anthropic",
+        model: INVESTO_ANTHROPIC_MODEL,
         reasoningEffort: "high",
+        role: "independent_review",
+      };
+
+    case "investment_committee":
+      return {
+        provider: "openai",
+        model: INVESTO_OPENAI_MODEL,
+        reasoningEffort: "high",
+        role: "final_synthesis",
       };
 
     case "classification":
     case "summary":
+    case "system_health":
       return {
-        model: INVESTO_PRIMARY_MODEL,
+        provider: "openai",
+        model: INVESTO_OPENAI_MODEL,
         reasoningEffort: "low",
+        role: "primary_analysis",
       };
 
     default: {
       const exhaustiveCheck: never = purpose;
+
       throw new Error(
         `Unsupported Investo model purpose: ${exhaustiveCheck}`,
       );
