@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "lint:investo": "eslint app/v2 components/investo lib/supabase proxy.ts"
+    "lint:investo": "eslint app/v2 components/investo lib/supabase lib/investo proxy.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.3",

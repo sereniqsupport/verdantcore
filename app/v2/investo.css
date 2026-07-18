@@ -505,3 +505,130 @@
     grid-template-columns: 1fr;
   }
 }
+
+.investo-system-message {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 11px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.investo-system-message-success {
+  border: 1px solid rgba(121, 200, 151, 0.28);
+  background: rgba(121, 200, 151, 0.08);
+  color: #b9e6c9;
+}
+
+.investo-system-message-error {
+  border: 1px solid rgba(223, 129, 123, 0.3);
+  background: rgba(223, 129, 123, 0.08);
+  color: #efb0ac;
+}
+
+.investo-setup-panel {
+  display: flex;
+  margin-bottom: 18px;
+  padding: 24px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid rgba(221, 196, 121, 0.25);
+  border-radius: 17px;
+  background: rgba(221, 196, 121, 0.07);
+}
+
+.investo-setup-panel h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.investo-setup-panel p:not(.investo-eyebrow) {
+  max-width: 760px;
+  margin: 10px 0 0;
+  color: var(--investo-soft);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.investo-setup-panel code {
+  display: block;
+  max-width: 800px;
+  margin-top: 12px;
+  color: #efb0ac;
+  font-size: 11px;
+  white-space: normal;
+}
+
+.investo-setup-panel button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  background: var(--investo-gold);
+  color: #17140a;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.investo-section-stack {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.investo-empty-state {
+  margin-top: 20px;
+  padding: 24px;
+  border: 1px dashed var(--investo-border-strong);
+  border-radius: 12px;
+  color: var(--investo-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.investo-table-wrap {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.investo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.investo-table th {
+  padding: 12px;
+  border-bottom: 1px solid var(--investo-border-strong);
+  color: var(--investo-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.investo-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--investo-border);
+  color: var(--investo-soft);
+}
+
+.investo-table td strong {
+  color: var(--investo-text);
+}
+
+@media (max-width: 680px) {
+  .investo-setup-panel {
+    display: block;
+  }
+
+  .investo-setup-panel form {
+    margin-top: 18px;
+  }
+
+  .investo-setup-panel button {
+    width: 100%;
+  }
+}
