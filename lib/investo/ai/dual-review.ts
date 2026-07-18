@@ -8,7 +8,6 @@ import { runInvestoModel } from "@/lib/investo/ai/provider";
 import type {
   InvestoAgentEvidence,
   InvestoDualReviewResult,
-  InvestoModelPurpose,
 } from "@/lib/investo/ai/types";
 
 type RunDualReviewInput = {
