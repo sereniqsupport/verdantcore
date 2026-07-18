@@ -1,0 +1,507 @@
+:root {
+  --investo-bg: #07100d;
+  --investo-panel: #0d1814;
+  --investo-panel-raised: #12211b;
+  --investo-border: rgba(211, 225, 216, 0.12);
+  --investo-border-strong: rgba(211, 225, 216, 0.22);
+  --investo-text: #f1f5f2;
+  --investo-muted: #96a79b;
+  --investo-soft: #c6d0c9;
+  --investo-gold: #ddc479;
+  --investo-green: #79c897;
+  --investo-red: #df817b;
+}
+
+.investo-login-page,
+.investo-private-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 12% 0%,
+      rgba(73, 122, 90, 0.14),
+      transparent 34rem
+    ),
+    radial-gradient(
+      circle at 90% 12%,
+      rgba(221, 196, 121, 0.08),
+      transparent 28rem
+    ),
+    var(--investo-bg);
+  color: var(--investo-text);
+}
+
+.investo-login-page {
+  display: grid;
+  padding: 28px;
+  place-items: center;
+}
+
+.investo-login-card {
+  width: min(100%, 500px);
+  padding: 42px;
+  border: 1px solid var(--investo-border);
+  border-radius: 22px;
+  background: rgba(13, 24, 20, 0.96);
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.36);
+}
+
+.investo-login-brand,
+.investo-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.investo-logo-mark {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(221, 196, 121, 0.45);
+  border-radius: 12px;
+  background: rgba(221, 196, 121, 0.08);
+  color: var(--investo-gold);
+  font-weight: 750;
+}
+
+.investo-login-brand strong,
+.investo-sidebar-brand strong {
+  display: block;
+}
+
+.investo-login-brand span,
+.investo-sidebar-brand small {
+  display: block;
+  margin-top: 3px;
+  color: var(--investo-muted);
+  font-size: 11px;
+}
+
+.investo-login-intro {
+  margin: 44px 0 30px;
+}
+
+.investo-eyebrow {
+  margin: 0 0 12px;
+  color: var(--investo-gold);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.investo-login-intro h1 {
+  margin: 0;
+  font-size: clamp(34px, 6vw, 50px);
+  letter-spacing: -0.05em;
+  line-height: 1.02;
+}
+
+.investo-login-intro > p:last-child {
+  margin: 20px 0 0;
+  color: var(--investo-soft);
+  line-height: 1.7;
+}
+
+.investo-login-form {
+  display: grid;
+  gap: 18px;
+}
+
+.investo-login-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.investo-login-form label span {
+  color: var(--investo-soft);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.investo-login-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--investo-border-strong);
+  border-radius: 11px;
+  outline: none;
+  background: #08120e;
+  color: var(--investo-text);
+}
+
+.investo-login-form input:focus {
+  border-color: rgba(221, 196, 121, 0.7);
+  box-shadow: 0 0 0 3px rgba(221, 196, 121, 0.08);
+}
+
+.investo-login-form button,
+.investo-sidebar-footer button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 11px;
+  cursor: pointer;
+  background: var(--investo-gold);
+  color: #17140a;
+  font-weight: 750;
+}
+
+.investo-login-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.investo-login-warning,
+.investo-login-error {
+  margin-bottom: 20px;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.investo-login-warning {
+  border: 1px solid rgba(221, 196, 121, 0.28);
+  background: rgba(221, 196, 121, 0.08);
+  color: #ead99f;
+}
+
+.investo-login-error {
+  border: 1px solid rgba(223, 129, 123, 0.3);
+  background: rgba(223, 129, 123, 0.08);
+  color: #efb0ac;
+}
+
+.investo-login-footnote {
+  margin: 22px 0 0;
+  color: var(--investo-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.investo-private-shell {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+}
+
+.investo-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  padding: 24px 18px;
+  flex-direction: column;
+  border-right: 1px solid var(--investo-border);
+  background: rgba(7, 16, 13, 0.94);
+}
+
+.investo-sidebar-brand {
+  padding: 0 8px 26px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.investo-sidebar nav {
+  display: grid;
+  gap: 5px;
+}
+
+.investo-sidebar nav a {
+  padding: 11px 12px;
+  border-radius: 9px;
+  color: var(--investo-muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.investo-sidebar nav a:hover {
+  background: var(--investo-panel-raised);
+  color: var(--investo-text);
+}
+
+.investo-sidebar-footer {
+  display: grid;
+  gap: 14px;
+  margin-top: auto;
+  padding: 18px 8px 0;
+  border-top: 1px solid var(--investo-border);
+}
+
+.investo-sidebar-footer span,
+.investo-sidebar-footer strong {
+  display: block;
+}
+
+.investo-sidebar-footer span {
+  color: var(--investo-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.investo-sidebar-footer strong {
+  overflow: hidden;
+  margin-top: 4px;
+  font-size: 11px;
+  text-overflow: ellipsis;
+}
+
+.investo-sidebar-footer button {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--investo-border-strong);
+  background: transparent;
+  color: var(--investo-soft);
+  font-size: 11px;
+}
+
+.investo-private-workspace {
+  min-width: 0;
+}
+
+.investo-private-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  min-height: 70px;
+  padding: 0 30px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--investo-border);
+  background: rgba(7, 16, 13, 0.88);
+  backdrop-filter: blur(18px);
+}
+
+.investo-private-header span,
+.investo-private-header strong {
+  display: block;
+}
+
+.investo-private-header span {
+  color: var(--investo-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.investo-private-header strong {
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.investo-system-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--investo-muted);
+  font-size: 11px;
+}
+
+.investo-system-status span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--investo-green);
+  box-shadow: 0 0 16px rgba(121, 200, 151, 0.7);
+}
+
+.investo-private-content {
+  width: min(1400px, calc(100% - 54px));
+  margin: 0 auto;
+  padding: 44px 0 80px;
+}
+
+.investo-page-heading {
+  display: flex;
+  margin-bottom: 26px;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.investo-page-heading h1 {
+  margin: 0;
+  font-size: clamp(38px, 5vw, 62px);
+  font-weight: 580;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.investo-page-heading p {
+  max-width: 570px;
+  margin: 0;
+  color: var(--investo-muted);
+  line-height: 1.7;
+}
+
+.investo-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.investo-card {
+  padding: 22px;
+  border: 1px solid var(--investo-border);
+  border-radius: 17px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.025),
+      transparent 48%
+    ),
+    var(--investo-panel);
+}
+
+.investo-card-label {
+  color: var(--investo-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.investo-card-value {
+  display: block;
+  margin-top: 25px;
+  font-size: 27px;
+  font-weight: 620;
+  letter-spacing: -0.04em;
+}
+
+.investo-card-detail {
+  display: block;
+  margin-top: 7px;
+  color: var(--investo-muted);
+  font-size: 12px;
+}
+
+.investo-work-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.investo-card h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.investo-card > p {
+  color: var(--investo-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.investo-prepared-list {
+  display: grid;
+  gap: 0;
+  margin-top: 20px;
+}
+
+.investo-prepared-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 14px;
+  padding: 16px 0;
+  align-items: center;
+  border-top: 1px solid var(--investo-border);
+}
+
+.investo-prepared-row > span:first-child {
+  color: var(--investo-gold);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.investo-prepared-row strong,
+.investo-prepared-row small {
+  display: block;
+}
+
+.investo-prepared-row strong {
+  font-size: 13px;
+}
+
+.investo-prepared-row small {
+  margin-top: 4px;
+  color: var(--investo-muted);
+  font-size: 11px;
+}
+
+.investo-pill {
+  padding: 6px 9px;
+  border: 1px solid var(--investo-border);
+  border-radius: 999px;
+  color: var(--investo-soft);
+  font-size: 10px;
+}
+
+@media (max-width: 1000px) {
+  .investo-private-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .investo-sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--investo-border);
+  }
+
+  .investo-sidebar nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .investo-sidebar-footer {
+    display: none;
+  }
+
+  .investo-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .investo-work-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .investo-login-card {
+    padding: 28px;
+  }
+
+  .investo-sidebar nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .investo-private-header {
+    padding: 0 18px;
+  }
+
+  .investo-system-status {
+    display: none;
+  }
+
+  .investo-private-content {
+    width: min(100% - 28px, 1400px);
+    padding-top: 28px;
+  }
+
+  .investo-page-heading {
+    display: block;
+  }
+
+  .investo-page-heading p {
+    margin-top: 14px;
+  }
+
+  .investo-metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .investo-prepared-row {
+    grid-template-columns: 1fr;
+  }
+}
