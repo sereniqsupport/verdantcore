@@ -1,30 +1,19 @@
-import type { Metadata } from "next";
-import { InvestoProtectedPage } from "@/components/investo/protected-page";
+import {
+  CompanyResearchWorkspace,
+} from "@/components/investo/research/CompanyResearchWorkspace";
+import {
+  requireInvestoUser,
+} from "@/lib/investo/auth";
 
-export const metadata: Metadata = {
-  title: "Research",
-};
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export default function Page() {
+export default async function ResearchPage() {
+  await requireInvestoUser();
+
   return (
-    <InvestoProtectedPage>
-      <section className="investo-page-heading">
-        <div>
-          <p className="investo-eyebrow">Investo</p>
-          <h1>Research</h1>
-        </div>
-
-        <p>Business quality, competitive advantage, management, financial strength, and valuation.</p>
-      </section>
-
-      <article className="investo-card">
-        <p className="investo-eyebrow">Foundation Ready</p>
-        <h2>This private workspace is ready for the next build phase.</h2>
-        <p>
-          Data connection, database records, analysis agents, and executive
-          decision workflows will be added without exposing this route publicly.
-        </p>
-      </article>
-    </InvestoProtectedPage>
+    <main className="mx-auto w-full max-w-7xl px-5 py-8 md:px-8 md:py-10">
+      <CompanyResearchWorkspace />
+    </main>
   );
 }
