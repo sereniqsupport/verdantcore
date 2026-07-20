@@ -42,3 +42,9 @@ next-env.d.ts
 
 # Allow the safe environment variable template
 !.env.example
+
+supabase/.temp/
+
+.env.local
+
+.env.*.local
