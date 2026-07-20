@@ -1,4 +1,8 @@
 import type { InvestoAgentEvidence } from "@/lib/investo/ai/types";
+import type {
+  InvestoModelUsage,
+  InvestoResearchUsage,
+} from "@/lib/investo/ai/usage";
 
 export type CompanyResearchRequest = {
   companyName: string;
@@ -96,17 +100,22 @@ export type CompanyResearchPipelineResult = {
     provider: string;
     model: string;
     output: string;
+    usage: InvestoModelUsage;
   };
 
   independentReview: {
     provider: string;
     model: string;
     output: string;
+    usage: InvestoModelUsage;
   };
 
   committee: {
     provider: string;
     model: string;
     output: CompanyResearchCommitteeOutput;
+    usage: InvestoModelUsage;
   };
+
+  usage: InvestoResearchUsage;
 };

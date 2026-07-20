@@ -15,6 +15,9 @@ import {
   runCompanyResearchPipeline,
 } from "@/lib/investo/agents/company-research-agent";
 import {
+  recordInvestoAgentUsage,
+} from "@/lib/investo/ai/usage-audit";
+import {
   validateCompanyResearchRequest,
 } from "@/lib/investo/agents/company-research-validation";
 
@@ -106,6 +109,23 @@ export async function POST(request: Request) {
 
     const result =
       await runCompanyResearchPipeline(input);
+
+    await recordInvestoAgentUsage({
+      supabase,
+      runId,
+      agentVersion: "investo-agent-v1",
+      resourceProfile:
+        "company-research-standard-v1",
+      usage: result.usage,
+      usageDetails: {
+        primaryAnalysis:
+          result.primaryAnalysis.usage,
+        independentReview:
+          result.independentReview.usage,
+        committee:
+          result.committee.usage,
+      },
+    });
 
     await completeInvestoAgentRun({
       supabase,

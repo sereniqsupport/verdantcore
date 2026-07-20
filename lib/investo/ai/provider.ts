@@ -5,6 +5,13 @@ import {
   getInvestoOpenAIClient,
 } from "@/lib/investo/ai/client";
 import { INVESTO_PROMPT_VERSION } from "@/lib/investo/ai/config";
+import {
+  getInvestoResourceProfile,
+  type InvestoResourceProfileId,
+} from "@/lib/investo/ai/resource-profiles";
+import type {
+  InvestoModelUsage,
+} from "@/lib/investo/ai/usage";
 import { selectInvestoModel } from "@/lib/investo/ai/model-router";
 import { INVESTO_SYSTEM_POLICY } from "@/lib/investo/ai/prompts";
 import type {
@@ -21,18 +28,26 @@ type RunInvestoModelInput = {
   additionalPolicy?: string;
   evidence?: InvestoAgentEvidence[];
   providerOverride?: InvestoAIProvider;
+  resourceProfileId?: InvestoResourceProfileId;
 };
 
 async function runOpenAIModel(
   model: string,
   reasoningEffort: "low" | "medium" | "high",
   instruction: string,
+  maxOutputTokens: number,
   additionalPolicy?: string,
-) {
+): Promise<{
+  output: string;
+  usage: InvestoModelUsage;
+}> {
   const client = getInvestoOpenAIClient();
+
+  const startedAt = Date.now();
 
   const response = await client.responses.create({
     model,
+    max_output_tokens: maxOutputTokens,
     reasoning: {
       effort: reasoningEffort,
     },
@@ -53,19 +68,38 @@ async function runOpenAIModel(
     );
   }
 
-  return output;
+  const usage = response.usage;
+
+  return {
+    output,
+    usage: {
+      inputTokens: usage?.input_tokens ?? 0,
+      cachedInputTokens:
+        usage?.input_tokens_details?.cached_tokens ?? 0,
+      outputTokens: usage?.output_tokens ?? 0,
+      totalTokens: usage?.total_tokens ?? 0,
+      durationMs: Date.now() - startedAt,
+      estimatedCostUsd: null,
+    },
+  };
 }
 
 async function runAnthropicModel(
   model: string,
   instruction: string,
+  maxOutputTokens: number,
   additionalPolicy?: string,
-) {
+): Promise<{
+  output: string;
+  usage: InvestoModelUsage;
+}> {
   const client = getInvestoAnthropicClient();
+
+  const startedAt = Date.now();
 
   const response = await client.messages.create({
     model,
-    max_tokens: 12000,
+    max_tokens: maxOutputTokens,
     system: [
       INVESTO_SYSTEM_POLICY,
       additionalPolicy,
@@ -99,7 +133,27 @@ async function runAnthropicModel(
     );
   }
 
-  return output;
+  const inputTokens =
+    response.usage.input_tokens ?? 0;
+  const cachedInputTokens =
+    response.usage.cache_read_input_tokens ?? 0;
+  const outputTokens =
+    response.usage.output_tokens ?? 0;
+
+  return {
+    output,
+    usage: {
+      inputTokens,
+      cachedInputTokens,
+      outputTokens,
+      totalTokens:
+        inputTokens +
+        cachedInputTokens +
+        outputTokens,
+      durationMs: Date.now() - startedAt,
+      estimatedCostUsd: null,
+    },
+  };
 }
 
 export async function runInvestoModel({
@@ -109,8 +163,20 @@ export async function runInvestoModel({
   additionalPolicy,
   evidence = [],
   providerOverride,
+  resourceProfileId,
 }: RunInvestoModelInput): Promise<InvestoAgentResult<string>> {
   const routedSelection = selectInvestoModel(purpose);
+
+  const resolvedProfileId =
+    resourceProfileId ??
+    (providerOverride === "anthropic"
+      ? "risk-review-standard"
+      : purpose === "investment_committee"
+        ? "committee-standard"
+        : "company-primary-standard");
+
+  const resourceProfile =
+    getInvestoResourceProfile(resolvedProfileId);
 
   const provider =
     providerOverride ?? routedSelection.provider;
@@ -122,26 +188,38 @@ export async function runInvestoModel({
       : process.env.INVESTO_ANTHROPIC_MODEL?.trim() ||
         "claude-opus-4-8";
 
-  const output =
+  const result =
     provider === "openai"
       ? await runOpenAIModel(
           model,
-          routedSelection.reasoningEffort,
+          resourceProfile.reasoningEffort,
           instruction,
+          resourceProfile.maxOutputTokens,
           additionalPolicy,
         )
       : await runAnthropicModel(
           model,
           instruction,
+          resourceProfile.maxOutputTokens,
           additionalPolicy,
         );
+
+  if (
+    result.usage.outputTokens >
+    resourceProfile.maxOutputTokens
+  ) {
+    throw new Error(
+      `${agentName} exceeded its output-token limit.`,
+    );
+  }
 
   return {
     agentName,
     provider,
     model,
     promptVersion: INVESTO_PROMPT_VERSION,
-    output,
+    output: result.output,
     evidence,
+    usage: result.usage,
   };
 }

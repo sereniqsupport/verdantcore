@@ -1,3 +1,5 @@
+import type { InvestoModelUsage } from "@/lib/investo/ai/usage";
+
 export type InvestoAIProvider =
   | "openai"
   | "anthropic";
@@ -40,6 +42,7 @@ export type InvestoAgentResult<T> = {
   promptVersion: string;
   output: T;
   evidence: InvestoAgentEvidence[];
+  usage: InvestoModelUsage;
 };
 
 export type InvestoDualReviewResult = {

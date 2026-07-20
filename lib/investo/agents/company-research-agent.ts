@@ -1,6 +1,14 @@
 import "server-only";
 
 import {
+  getInvestoAgentContract,
+} from "@/lib/investo/ai/agent-registry";
+import {
+  aggregateInvestoUsage,
+  enforceResearchUsageBudget,
+} from "@/lib/investo/ai/usage";
+
+import {
   INVESTO_COMMITTEE_POLICY,
   INVESTO_INDEPENDENT_REVIEW_POLICY,
   INVESTO_PRIMARY_ANALYST_POLICY,
@@ -29,10 +37,27 @@ export async function runCompanyResearchPipeline(
   const evidencePacket =
     formatCompanyEvidencePacket(request);
 
+  const primaryContract =
+    getInvestoAgentContract(
+      "primary-company-analyst",
+    );
+
+  const riskContract =
+    getInvestoAgentContract(
+      "independent-risk-reviewer",
+    );
+
+  const committeeContract =
+    getInvestoAgentContract(
+      "investment-committee",
+    );
+
   const primary = await runInvestoModel({
     agentName: "company-research-primary",
     purpose: "company_research",
-    providerOverride: "openai",
+    providerOverride: primaryContract.provider,
+    resourceProfileId:
+      primaryContract.resourceProfileId,
     additionalPolicy:
       INVESTO_PRIMARY_ANALYST_POLICY,
     evidence: request.evidence,
@@ -46,7 +71,9 @@ ${evidencePacket}
   const independentReview = await runInvestoModel({
     agentName: "company-research-independent-review",
     purpose: "thesis_challenge",
-    providerOverride: "anthropic",
+    providerOverride: riskContract.provider,
+    resourceProfileId:
+      riskContract.resourceProfileId,
     additionalPolicy:
       INVESTO_INDEPENDENT_REVIEW_POLICY,
     evidence: request.evidence,
@@ -77,7 +104,9 @@ Do not merely rewrite the primary analysis.
   const committee = await runInvestoModel({
     agentName: "company-research-committee",
     purpose: "investment_committee",
-    providerOverride: "openai",
+    providerOverride: committeeContract.provider,
+    resourceProfileId:
+      committeeContract.resourceProfileId,
     additionalPolicy: [
       INVESTO_COMMITTEE_POLICY,
       INVESTO_COMMITTEE_JSON_POLICY,
@@ -113,23 +142,36 @@ Return only the required JSON object.
 
   const validated = validateCommitteeOutput(parsed);
 
+  const usage = aggregateInvestoUsage([
+    primary.usage,
+    independentReview.usage,
+    committee.usage,
+  ]);
+
+  enforceResearchUsageBudget(usage);
+
   return {
     primaryAnalysis: {
       provider: primary.provider,
       model: primary.model,
       output: primary.output,
+      usage: primary.usage,
     },
 
     independentReview: {
       provider: independentReview.provider,
       model: independentReview.model,
       output: independentReview.output,
+      usage: independentReview.usage,
     },
 
     committee: {
       provider: committee.provider,
       model: committee.model,
       output: validated,
+      usage: committee.usage,
     },
+
+    usage,
   };
 }
