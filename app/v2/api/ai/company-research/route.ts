@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { saveCompletedResearch } from "@/lib/investo/research/repository";
 import { requireInvestoUser } from "@/lib/investo/auth";
 import {
   beginInvestoAgentRun,
@@ -11,21 +12,14 @@ import {
   INVESTO_OPENAI_MODEL,
   INVESTO_PROMPT_VERSION,
 } from "@/lib/investo/ai/config";
-import {
-  runCompanyResearchPipeline,
-} from "@/lib/investo/agents/company-research-agent";
-import {
-  recordInvestoAgentUsage,
-} from "@/lib/investo/ai/usage-audit";
-import {
-  validateCompanyResearchRequest,
-} from "@/lib/investo/agents/company-research-validation";
+import { runCompanyResearchPipeline } from "@/lib/investo/agents/company-research-agent";
+import { recordInvestoAgentUsage } from "@/lib/investo/ai/usage-audit";
+import { validateCompanyResearchRequest } from "@/lib/investo/agents/company-research-validation";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  const { supabase, user } =
-    await requireInvestoUser();
+  const { supabase, user } = await requireInvestoUser();
 
   if (!hasCompleteInvestoAIConfiguration()) {
     return NextResponse.json(
@@ -34,10 +28,7 @@ export async function POST(request: Request) {
         status: "not_configured",
         message:
           "Both server-side AI provider keys are required before company research can run.",
-        requiredConfiguration: [
-          "OPENAI_API_KEY",
-          "ANTHROPIC_API_KEY",
-        ],
+        requiredConfiguration: ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"],
       },
       {
         status: 503,
@@ -102,28 +93,22 @@ export async function POST(request: Request) {
         `Ticker: ${input.ticker ?? "not provided"}`,
         `Evidence records: ${input.evidence.length}`,
       ].join("; "),
-      modelName:
-        `${INVESTO_OPENAI_MODEL} + ${INVESTO_ANTHROPIC_MODEL}`,
+      modelName: `${INVESTO_OPENAI_MODEL} + ${INVESTO_ANTHROPIC_MODEL}`,
       promptVersion: INVESTO_PROMPT_VERSION,
     });
 
-    const result =
-      await runCompanyResearchPipeline(input);
+    const result = await runCompanyResearchPipeline(input);
 
     await recordInvestoAgentUsage({
       supabase,
       runId,
       agentVersion: "investo-agent-v1",
-      resourceProfile:
-        "company-research-standard-v1",
+      resourceProfile: "company-research-standard-v1",
       usage: result.usage,
       usageDetails: {
-        primaryAnalysis:
-          result.primaryAnalysis.usage,
-        independentReview:
-          result.independentReview.usage,
-        committee:
-          result.committee.usage,
+        primaryAnalysis: result.primaryAnalysis.usage,
+        independentReview: result.independentReview.usage,
+        committee: result.committee.usage,
       },
     });
 
@@ -131,21 +116,22 @@ export async function POST(request: Request) {
       supabase,
       runId,
       outputSummary: JSON.stringify({
-        companyName:
-          result.committee.output.companyName,
-        ticker:
-          result.committee.output.ticker,
-        conclusion:
-          result.committee.output.conclusion,
-        agreement:
-          result.committee.output.modelAgreement.status,
-        proposedHumanAction:
-          result.committee.output
-            .proposedHumanAction.action,
+        companyName: result.committee.output.companyName,
+        ticker: result.committee.output.ticker,
+        conclusion: result.committee.output.conclusion,
+        agreement: result.committee.output.modelAgreement.status,
+        proposedHumanAction: result.committee.output.proposedHumanAction.action,
         humanApprovalRequired: true,
         transactionExecuted: false,
       }),
       evidence: input.evidence,
+    });
+
+    const savedReport = await saveCompletedResearch({
+      supabase,
+      userId: user.id,
+      evidence: input.evidence,
+      result,
     });
 
     return NextResponse.json(
@@ -154,6 +140,7 @@ export async function POST(request: Request) {
         status: "completed",
         executionMode: "human-approved",
         research: result,
+        savedReport,
       },
       {
         headers: {

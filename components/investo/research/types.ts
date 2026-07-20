@@ -49,18 +49,12 @@ export type CommitteeOutput = {
 
   modelAgreement: {
     status:
-      | "material_agreement"
-      | "qualified_agreement"
-      | "material_disagreement";
+      "material_agreement" | "qualified_agreement" | "material_disagreement";
     agreedPoints: string[];
     disputedPoints: string[];
   };
 
-  conclusion:
-    | "attractive"
-    | "watch"
-    | "insufficient_evidence"
-    | "avoid";
+  conclusion: "attractive" | "watch" | "insufficient_evidence" | "avoid";
 
   proposedHumanAction: {
     action:
@@ -83,6 +77,7 @@ export type CommitteeOutput = {
 };
 
 export type CompanyResearchResponse = {
+  savedReport: SavedResearchReportResponse;
   application: string;
   status: "completed";
   executionMode: "human-approved";
@@ -113,3 +108,14 @@ export type ResearchErrorResponse = {
   message?: string;
   requiredConfiguration?: string[];
 };
+
+export type SavedResearchReportResponse = {
+  id: string;
+  symbol: string;
+  title: string;
+  executive_summary: string | null;
+  created_at: string;
+};
+
+export type ResearchHumanActionName =
+  "add_to_watchlist" | "send_to_decision_queue" | "record_no_action";

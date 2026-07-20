@@ -1,5 +1,7 @@
 "use client";
 
+import { ResearchActionPanel } from "@/components/investo/research/ResearchActionPanel";
+
 import type {
   CommitteeOutput,
   CompanyResearchResponse,
@@ -9,11 +11,7 @@ import {
   humanize,
 } from "@/components/investo/research/research-format";
 
-function StatusBadge({
-  value,
-}: {
-  value: string;
-}) {
+function StatusBadge({ value }: { value: string }) {
   return (
     <span
       className={[
@@ -34,11 +32,7 @@ function TextList({
   emptyLabel?: string;
 }) {
   if (items.length === 0) {
-    return (
-      <p className="text-sm text-white/45">
-        {emptyLabel}
-      </p>
-    );
+    return <p className="text-sm text-white/45">{emptyLabel}</p>;
   }
 
   return (
@@ -71,9 +65,7 @@ function DetailCard({
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-white">
-          {title}
-        </h3>
+        <h3 className="text-sm font-semibold text-white">{title}</h3>
 
         {status ? <StatusBadge value={status} /> : null}
       </div>
@@ -83,11 +75,7 @@ function DetailCard({
   );
 }
 
-function CommitteeDecision({
-  output,
-}: {
-  output: CommitteeOutput;
-}) {
+function CommitteeDecision({ output }: { output: CommitteeOutput }) {
   return (
     <div className="space-y-6">
       <section className="rounded-3xl border border-white/10 bg-white/[0.045] p-6">
@@ -99,9 +87,7 @@ function CommitteeDecision({
 
             <h2 className="mt-2 text-2xl font-semibold text-white">
               {output.companyName}
-              {output.ticker
-                ? ` · ${output.ticker}`
-                : ""}
+              {output.ticker ? ` · ${output.ticker}` : ""}
             </h2>
 
             <p className="mt-2 text-sm text-white/45">
@@ -114,9 +100,7 @@ function CommitteeDecision({
 
           <div className="flex flex-wrap gap-2">
             <StatusBadge value={output.conclusion} />
-            <StatusBadge
-              value={output.modelAgreement.status}
-            />
+            <StatusBadge value={output.modelAgreement.status} />
           </div>
         </div>
 
@@ -151,21 +135,12 @@ function CommitteeDecision({
           <p className="mb-3 text-xs font-medium uppercase tracking-[0.15em] text-white/35">
             Advantages
           </p>
-          <TextList
-            items={
-              output.competitivePosition.advantages
-            }
-          />
+          <TextList items={output.competitivePosition.advantages} />
 
           <p className="mb-3 mt-6 text-xs font-medium uppercase tracking-[0.15em] text-white/35">
             Vulnerabilities
           </p>
-          <TextList
-            items={
-              output.competitivePosition
-                .vulnerabilities
-            }
-          />
+          <TextList items={output.competitivePosition.vulnerabilities} />
         </DetailCard>
 
         <DetailCard
@@ -175,16 +150,12 @@ function CommitteeDecision({
           <p className="mb-3 text-xs font-medium uppercase tracking-[0.15em] text-white/35">
             Strengths
           </p>
-          <TextList
-            items={output.financialStrength.strengths}
-          />
+          <TextList items={output.financialStrength.strengths} />
 
           <p className="mb-3 mt-6 text-xs font-medium uppercase tracking-[0.15em] text-white/35">
             Concerns
           </p>
-          <TextList
-            items={output.financialStrength.concerns}
-          />
+          <TextList items={output.financialStrength.concerns} />
         </DetailCard>
 
         <DetailCard
@@ -204,9 +175,7 @@ function CommitteeDecision({
           <p className="mb-3 text-xs font-medium uppercase tracking-[0.15em] text-white/35">
             Agreed Points
           </p>
-          <TextList
-            items={output.modelAgreement.agreedPoints}
-          />
+          <TextList items={output.modelAgreement.agreedPoints} />
 
           <p className="mb-3 mt-6 text-xs font-medium uppercase tracking-[0.15em] text-white/35">
             Disputed Points
@@ -242,9 +211,7 @@ function CommitteeDecision({
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <h3 className="text-xl font-semibold text-white">
-            {humanize(
-              output.proposedHumanAction.action,
-            )}
+            {humanize(output.proposedHumanAction.action)}
           </h3>
 
           <span className="rounded-full border border-amber-300/30 px-3 py-1 text-xs text-amber-100">
@@ -262,18 +229,14 @@ function CommitteeDecision({
           </p>
 
           <TextList
-            items={
-              output.proposedHumanAction
-                .conditionsBeforeAction
-            }
+            items={output.proposedHumanAction.conditionsBeforeAction}
             emptyLabel="No immediate portfolio action is authorized."
           />
         </div>
 
         <p className="mt-6 border-t border-white/10 pt-4 text-xs leading-5 text-white/40">
-          Investo prepared this analysis for human
-          review. No transaction was approved, placed,
-          or executed.
+          Investo prepared this analysis for human review. No transaction was
+          approved, placed, or executed.
         </p>
       </section>
     </div>
@@ -295,9 +258,7 @@ function ModelReview({
     <details className="rounded-2xl border border-white/10 bg-white/[0.025]">
       <summary className="cursor-pointer list-none px-5 py-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="text-sm font-medium text-white">
-            {label}
-          </span>
+          <span className="text-sm font-medium text-white">{label}</span>
 
           <span className="text-xs text-white/40">
             {provider} · {model}
@@ -321,9 +282,7 @@ export function ResearchResults({
 }) {
   return (
     <div className="space-y-8">
-      <CommitteeDecision
-        output={result.research.committee.output}
-      />
+      <CommitteeDecision output={result.research.committee.output} />
 
       <section>
         <div className="mb-4">
@@ -331,39 +290,28 @@ export function ResearchResults({
             Supporting Reviews
           </p>
           <p className="mt-2 text-sm text-white/50">
-            Expand either review to inspect how the
-            committee reached its conclusion.
+            Expand either review to inspect how the committee reached its
+            conclusion.
           </p>
         </div>
 
         <div className="space-y-3">
           <ModelReview
             label="Primary Company Analysis"
-            provider={
-              result.research.primaryAnalysis.provider
-            }
-            model={
-              result.research.primaryAnalysis.model
-            }
-            output={
-              result.research.primaryAnalysis.output
-            }
+            provider={result.research.primaryAnalysis.provider}
+            model={result.research.primaryAnalysis.model}
+            output={result.research.primaryAnalysis.output}
           />
 
           <ModelReview
             label="Independent Risk Challenge"
-            provider={
-              result.research.independentReview.provider
-            }
-            model={
-              result.research.independentReview.model
-            }
-            output={
-              result.research.independentReview.output
-            }
+            provider={result.research.independentReview.provider}
+            model={result.research.independentReview.model}
+            output={result.research.independentReview.output}
           />
         </div>
       </section>
+      <ResearchActionPanel reportId={result.savedReport.id} />
     </div>
   );
 }
