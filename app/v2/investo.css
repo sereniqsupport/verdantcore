@@ -345,11 +345,7 @@
   border: 1px solid var(--investo-border);
   border-radius: 17px;
   background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.025),
-      transparent 48%
-    ),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.025), transparent 48%),
     var(--investo-panel);
 }
 
@@ -632,3 +628,78 @@
     width: 100%;
   }
 }
+
+/* INVESTO GOOGLE AUTH START */
+
+.investo-google-login-form {
+  margin-top: 1.5rem;
+}
+
+.investo-google-login-button {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.75rem;
+  color: #121712;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-weight: 650;
+  gap: 0.75rem;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+  width: 100%;
+}
+
+.investo-google-login-button:hover:not(:disabled) {
+  border-color: rgba(231, 204, 119, 0.7);
+  box-shadow: 0 0 0 3px rgba(231, 204, 119, 0.1);
+  transform: translateY(-1px);
+}
+
+.investo-google-login-button:focus-visible {
+  outline: 2px solid #e7cc77;
+  outline-offset: 3px;
+}
+
+.investo-google-login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.investo-google-icon {
+  flex: 0 0 auto;
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+.investo-login-divider {
+  align-items: center;
+  color: rgba(255, 255, 255, 0.45);
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: 650;
+  gap: 0.8rem;
+  letter-spacing: 0.08em;
+  margin: 1.4rem 0;
+  text-transform: uppercase;
+}
+
+.investo-login-divider::before,
+.investo-login-divider::after {
+  background: rgba(255, 255, 255, 0.12);
+  content: "";
+  flex: 1;
+  height: 1px;
+}
+
+.investo-login-divider span {
+  white-space: nowrap;
+}
+
+/* INVESTO GOOGLE AUTH END */
