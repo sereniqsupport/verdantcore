@@ -7,7 +7,21 @@ import type { InvestoResearchReport } from "@/lib/investo/database/types";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function ResearchPage() {
+export default async function ResearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ticker?: string }>;
+}) {
+  const parameters = await searchParams;
+  const initialTicker =
+    typeof parameters.ticker === "string"
+      ? parameters.ticker
+          .trim()
+          .toUpperCase()
+          .replace(/[^A-Z0-9.-]/g, "")
+          .slice(0, 12)
+      : "";
+
   const { supabase, user } = await requireInvestoUser();
 
   let reports: InvestoResearchReport[] = [];
@@ -23,7 +37,7 @@ export default async function ResearchPage() {
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-10 px-5 py-8 md:px-8 md:py-10">
-      <CompanyResearchWorkspace />
+      <CompanyResearchWorkspace initialTicker={initialTicker} />
 
       <ResearchHistory reports={reports} />
     </main>

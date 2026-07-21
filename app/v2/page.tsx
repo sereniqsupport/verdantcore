@@ -4,6 +4,7 @@ import { initializeInvestoWorkspace } from "@/app/v2/bootstrap-actions";
 import { requireInvestoUser } from "@/lib/investo/auth";
 import { bootstrapInvestoWorkspace } from "@/lib/investo/bootstrap";
 import { loadInvestoDashboard } from "@/lib/investo/dashboard";
+import { InvestoOperationsControl } from "@/components/investo/operations/InvestoOperationsControl";
 
 export const metadata: Metadata = {
   title: "Command Center",
@@ -30,10 +31,7 @@ export default async function InvestoCommandCenterPage({
   const params = await searchParams;
   const { supabase, user } = await requireInvestoUser();
 
-  const bootstrap = await bootstrapInvestoWorkspace(
-    supabase,
-    user,
-  );
+  const bootstrap = await bootstrapInvestoWorkspace(supabase, user);
 
   const dashboard = bootstrap.error
     ? {
@@ -104,6 +102,8 @@ export default async function InvestoCommandCenterPage({
         </section>
       ) : null}
 
+      <InvestoOperationsControl supabase={supabase} userId={user.id} />
+
       <section className="investo-metric-grid">
         <article className="investo-card">
           <span className="investo-card-label">Portfolio Value</span>
@@ -120,9 +120,7 @@ export default async function InvestoCommandCenterPage({
           <strong className="investo-card-value">
             {currency(dashboard.availableCapital)}
           </strong>
-          <span className="investo-card-detail">
-            Cash and Treasury reserve
-          </span>
+          <span className="investo-card-detail">Cash and Treasury reserve</span>
         </article>
 
         <article className="investo-card">
@@ -130,16 +128,12 @@ export default async function InvestoCommandCenterPage({
           <strong className="investo-card-value">
             {dashboard.preparedDecisions}
           </strong>
-          <span className="investo-card-detail">
-            Human approval required
-          </span>
+          <span className="investo-card-detail">Human approval required</span>
         </article>
 
         <article className="investo-card">
           <span className="investo-card-label">Open Alerts</span>
-          <strong className="investo-card-value">
-            {dashboard.openAlerts}
-          </strong>
+          <strong className="investo-card-value">{dashboard.openAlerts}</strong>
           <span className="investo-card-detail">
             Material portfolio changes
           </span>
@@ -157,9 +151,7 @@ export default async function InvestoCommandCenterPage({
 
               <div>
                 <strong>{dashboard.holdingsCount} positions</strong>
-                <small>
-                  Securities currently recorded in Investo
-                </small>
+                <small>Securities currently recorded in Investo</small>
               </div>
 
               <span className="investo-pill">
@@ -172,9 +164,7 @@ export default async function InvestoCommandCenterPage({
 
               <div>
                 <strong>{dashboard.watchlistCount} opportunities</strong>
-                <small>
-                  Businesses under research and valuation
-                </small>
+                <small>Businesses under research and valuation</small>
               </div>
 
               <span className="investo-pill">Private</span>
@@ -185,13 +175,9 @@ export default async function InvestoCommandCenterPage({
 
               <div>
                 <strong>
-                  {dashboard.databaseReady
-                    ? "Connected"
-                    : "Action required"}
+                  {dashboard.databaseReady ? "Connected" : "Action required"}
                 </strong>
-                <small>
-                  Supabase investment records and security controls
-                </small>
+                <small>Supabase investment records and security controls</small>
               </div>
 
               <span className="investo-pill">

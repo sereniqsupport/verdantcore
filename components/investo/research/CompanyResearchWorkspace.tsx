@@ -1,19 +1,9 @@
 "use client";
 
-import {
-  FormEvent,
-  useMemo,
-  useState,
-} from "react";
-import {
-  EvidenceEditor,
-} from "@/components/investo/research/EvidenceEditor";
-import {
-  ResearchResults,
-} from "@/components/investo/research/ResearchResults";
-import {
-  createEvidenceDraft,
-} from "@/components/investo/research/research-format";
+import { FormEvent, useMemo, useState } from "react";
+import { EvidenceEditor } from "@/components/investo/research/EvidenceEditor";
+import { ResearchResults } from "@/components/investo/research/ResearchResults";
+import { createEvidenceDraft } from "@/components/investo/research/research-format";
 import type {
   CompanyResearchResponse,
   EvidenceDraft,
@@ -41,47 +31,40 @@ function cleanEvidence(evidence: EvidenceDraft[]) {
     title: item.title.trim(),
     source: item.source.trim() || undefined,
     sourceUrl: item.sourceUrl.trim() || undefined,
-    publishedAt:
-      item.publishedAt.trim() || undefined,
+    publishedAt: item.publishedAt.trim() || undefined,
     dataAsOf: item.dataAsOf.trim() || undefined,
     note: item.note.trim() || undefined,
   }));
 }
 
-export function CompanyResearchWorkspace() {
-  const [companyName, setCompanyName] =
-    useState("");
-  const [ticker, setTicker] = useState("");
-  const [researchQuestion, setResearchQuestion] =
-    useState("");
-  const [evidence, setEvidence] = useState<
-    EvidenceDraft[]
-  >([createEvidenceDraft()]);
-  const [researchState, setResearchState] =
-    useState<ResearchState>({
-      status: "idle",
-    });
+export function CompanyResearchWorkspace({
+  initialTicker = "",
+}: {
+  initialTicker?: string;
+}) {
+  const [companyName, setCompanyName] = useState("");
+  const [ticker, setTicker] = useState(initialTicker);
+  const [researchQuestion, setResearchQuestion] = useState("");
+  const [evidence, setEvidence] = useState<EvidenceDraft[]>([
+    createEvidenceDraft(),
+  ]);
+  const [researchState, setResearchState] = useState<ResearchState>({
+    status: "idle",
+  });
 
-  const isRunning =
-    researchState.status === "running";
+  const isRunning = researchState.status === "running";
 
   const evidenceReady = useMemo(
     () =>
       evidence.length > 0 &&
-      evidence.every(
-        (item) => item.title.trim().length > 0,
-      ),
+      evidence.every((item) => item.title.trim().length > 0),
     [evidence],
   );
 
   const canSubmit =
-    companyName.trim().length > 0 &&
-    evidenceReady &&
-    !isRunning;
+    companyName.trim().length > 0 && evidenceReady && !isRunning;
 
-  async function submitResearch(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  async function submitResearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!canSubmit) {
@@ -93,34 +76,25 @@ export function CompanyResearchWorkspace() {
     });
 
     try {
-      const response = await fetch(
-        "/v2/api/ai/company-research",
-        {
-          method: "POST",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            companyName: companyName.trim(),
-            ticker:
-              ticker.trim().toUpperCase() ||
-              undefined,
-            researchQuestion:
-              researchQuestion.trim() ||
-              undefined,
-            evidence: cleanEvidence(evidence),
-          }),
+      const response = await fetch("/v2/api/ai/company-research", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          companyName: companyName.trim(),
+          ticker: ticker.trim().toUpperCase() || undefined,
+          researchQuestion: researchQuestion.trim() || undefined,
+          evidence: cleanEvidence(evidence),
+        }),
+      });
 
       const payload = (await response.json()) as
-        | CompanyResearchResponse
-        | ResearchErrorResponse;
+        CompanyResearchResponse | ResearchErrorResponse;
 
       if (!response.ok) {
-        const errorPayload =
-          payload as ResearchErrorResponse;
+        const errorPayload = payload as ResearchErrorResponse;
 
         throw new Error(
           errorPayload.message ??
@@ -130,8 +104,7 @@ export function CompanyResearchWorkspace() {
 
       setResearchState({
         status: "completed",
-        result:
-          payload as CompanyResearchResponse,
+        result: payload as CompanyResearchResponse,
       });
     } catch (error) {
       setResearchState({
@@ -163,15 +136,13 @@ export function CompanyResearchWorkspace() {
           </p>
 
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Evaluate a business before considering
-            capital.
+            Evaluate a business before considering capital.
           </h1>
 
           <p className="mt-4 text-base leading-7 text-white/60">
-            Provide verified evidence. Investo will
-            prepare a primary financial review, an
-            independent risk challenge, and a final
-            committee conclusion for your approval.
+            Provide verified evidence. Investo will prepare a primary financial
+            review, an independent risk challenge, and a final committee
+            conclusion for your approval.
           </p>
         </div>
 
@@ -191,10 +162,7 @@ export function CompanyResearchWorkspace() {
         </div>
       </section>
 
-      <form
-        onSubmit={submitResearch}
-        className="space-y-8"
-      >
+      <form onSubmit={submitResearch} className="space-y-8">
         <section className="rounded-3xl border border-white/10 bg-white/[0.025] p-6 md:p-8">
           <div>
             <h2 className="text-lg font-semibold text-white">
@@ -202,8 +170,8 @@ export function CompanyResearchWorkspace() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-white/45">
-              Identify the business and the decision
-              question that requires review.
+              Identify the business and the decision question that requires
+              review.
             </p>
           </div>
 
@@ -217,28 +185,20 @@ export function CompanyResearchWorkspace() {
                 required
                 disabled={isRunning}
                 value={companyName}
-                onChange={(event) =>
-                  setCompanyName(event.target.value)
-                }
+                onChange={(event) => setCompanyName(event.target.value)}
                 placeholder="Microsoft Corporation"
                 className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-white/30 disabled:opacity-50"
               />
             </label>
 
             <label className="space-y-2">
-              <span className="text-xs font-medium text-white/55">
-                Ticker
-              </span>
+              <span className="text-xs font-medium text-white/55">Ticker</span>
 
               <input
                 disabled={isRunning}
                 value={ticker}
                 onChange={(event) =>
-                  setTicker(
-                    event.target.value
-                      .toUpperCase()
-                      .slice(0, 20),
-                  )
+                  setTicker(event.target.value.toUpperCase().slice(0, 20))
                 }
                 placeholder="MSFT"
                 className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm uppercase text-white outline-none transition placeholder:text-white/25 focus:border-white/30 disabled:opacity-50"
@@ -254,11 +214,7 @@ export function CompanyResearchWorkspace() {
                 disabled={isRunning}
                 rows={4}
                 value={researchQuestion}
-                onChange={(event) =>
-                  setResearchQuestion(
-                    event.target.value,
-                  )
-                }
+                onChange={(event) => setResearchQuestion(event.target.value)}
                 placeholder="Does the current evidence support further valuation work or an initial position?"
                 className="w-full resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-white/25 focus:border-white/30 disabled:opacity-50"
               />
@@ -273,10 +229,9 @@ export function CompanyResearchWorkspace() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-white/45">
-              Add filings, earnings material, financial
-              facts, operating metrics, or other
-              verified evidence. Investo will not fill
-              missing facts through assumptions.
+              Add filings, earnings material, financial facts, operating
+              metrics, or other verified evidence. Investo will not fill missing
+              facts through assumptions.
             </p>
           </div>
 
@@ -306,14 +261,13 @@ export function CompanyResearchWorkspace() {
               No transaction authority
             </p>
             <p className="mt-1 text-xs leading-5 text-white/40">
-              Research may propose an action, but only
-              you can approve a portfolio decision.
+              Research may propose an action, but only you can approve a
+              portfolio decision.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {researchState.status ===
-            "completed" ? (
+            {researchState.status === "completed" ? (
               <button
                 type="button"
                 onClick={resetWorkspace}
@@ -328,9 +282,7 @@ export function CompanyResearchWorkspace() {
               disabled={!canSubmit}
               className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-35"
             >
-              {isRunning
-                ? "Running committee review..."
-                : "Run company review"}
+              {isRunning ? "Running committee review..." : "Run company review"}
             </button>
           </div>
         </section>
@@ -350,8 +302,8 @@ export function CompanyResearchWorkspace() {
               </p>
 
               <p className="mt-1 text-sm text-white/45">
-                Primary analysis, independent challenge,
-                and committee reconciliation are running.
+                Primary analysis, independent challenge, and committee
+                reconciliation are running.
               </p>
             </div>
           </div>
@@ -359,9 +311,7 @@ export function CompanyResearchWorkspace() {
       ) : null}
 
       {researchState.status === "completed" ? (
-        <ResearchResults
-          result={researchState.result}
-        />
+        <ResearchResults result={researchState.result} />
       ) : null}
     </div>
   );

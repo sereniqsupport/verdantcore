@@ -15,10 +15,65 @@ import {
 import { runCompanyResearchPipeline } from "@/lib/investo/agents/company-research-agent";
 import { recordInvestoAgentUsage } from "@/lib/investo/ai/usage-audit";
 import { validateCompanyResearchRequest } from "@/lib/investo/agents/company-research-validation";
+import {
+  beginInvestoOperationsActivity,
+  completeInvestoOperationsActivity,
+  failInvestoOperationsActivity,
+  getInvestoRuntimeControl,
+} from "@/lib/investo/operations/control";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  const operationsSupabase = await createSupabaseServerClient();
+  const {
+    data: { user: operationsUser },
+  } = await operationsSupabase.auth.getUser();
+
+  if (!operationsUser) {
+    return Response.json(
+      {
+        status: "unauthorized",
+        message: "Authentication is required.",
+        transactionExecuted: false,
+      },
+      {
+        status: 401,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
+  }
+
+  const runtimeControl = await getInvestoRuntimeControl(
+    operationsSupabase,
+    operationsUser.id,
+  );
+
+  if (runtimeControl.status !== "running") {
+    return Response.json(
+      {
+        status: "automation_not_running",
+        runtimeStatus: runtimeControl.status,
+        message:
+          runtimeControl.status === "paused"
+            ? "Investo research is paused. Resume operations before starting new research."
+            : "Investo research is stopped. Start operations before starting new research.",
+        transactionExecuted: false,
+      },
+      {
+        status: 423,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
+  }
+
+  const operationsStartedAt = Date.now();
+  let operationsActivityId: string | null = null;
+
   const { supabase, user } = await requireInvestoUser();
 
   if (!hasCompleteInvestoAIConfiguration()) {
@@ -83,6 +138,13 @@ export async function POST(request: Request) {
   let runId: string | null = null;
 
   try {
+    operationsActivityId = await beginInvestoOperationsActivity({
+      supabase: operationsSupabase,
+      userId: operationsUser.id,
+      agentName: "company-research-committee",
+      subject: null,
+    });
+
     runId = await beginInvestoAgentRun({
       supabase,
       userId: user.id,
@@ -110,6 +172,12 @@ export async function POST(request: Request) {
         independentReview: result.independentReview.usage,
         committee: result.committee.usage,
       },
+    });
+
+    await completeInvestoOperationsActivity({
+      supabase: operationsSupabase,
+      activityId: operationsActivityId,
+      startedAt: operationsStartedAt,
     });
 
     await completeInvestoAgentRun({
@@ -149,6 +217,14 @@ export async function POST(request: Request) {
       },
     );
   } catch (error) {
+    await failInvestoOperationsActivity({
+      supabase: operationsSupabase,
+      activityId: operationsActivityId,
+      startedAt: operationsStartedAt,
+      errorMessage:
+        error instanceof Error ? error.message : "Unknown research failure.",
+    });
+
     const message =
       error instanceof Error
         ? error.message
