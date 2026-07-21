@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { saveCompletedResearch } from "@/lib/investo/research/repository";
-import { requireInvestoUser } from "@/lib/investo/auth";
+
 import {
   beginInvestoAgentRun,
   completeInvestoAgentRun,
@@ -12,54 +11,36 @@ import {
   INVESTO_OPENAI_MODEL,
   INVESTO_PROMPT_VERSION,
 } from "@/lib/investo/ai/config";
-import { runCompanyResearchPipeline } from "@/lib/investo/agents/company-research-agent";
 import { recordInvestoAgentUsage } from "@/lib/investo/ai/usage-audit";
+import { runCompanyResearchPipeline } from "@/lib/investo/agents/company-research-agent";
 import { validateCompanyResearchRequest } from "@/lib/investo/agents/company-research-validation";
+import { requireInvestoUser } from "@/lib/investo/auth";
 import {
   beginInvestoOperationsActivity,
   completeInvestoOperationsActivity,
   failInvestoOperationsActivity,
   getInvestoRuntimeControl,
 } from "@/lib/investo/operations/control";
+import { saveCompletedResearch } from "@/lib/investo/research/repository";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  const operationsSupabase = await createSupabaseServerClient();
-  const {
-    data: { user: operationsUser },
-  } = await operationsSupabase.auth.getUser();
+  const { supabase, user } = await requireInvestoUser();
 
-  if (!operationsUser) {
-    return Response.json(
-      {
-        status: "unauthorized",
-        message: "Authentication is required.",
-        transactionExecuted: false,
-      },
-      {
-        status: 401,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      },
-    );
-  }
-
-  const runtimeControl = await getInvestoRuntimeControl(
-    operationsSupabase,
-    operationsUser.id,
-  );
+  const runtimeControl = await getInvestoRuntimeControl(supabase, user.id);
 
   if (runtimeControl.status !== "running") {
-    return Response.json(
+    return NextResponse.json(
       {
+        application: "Investo",
         status: "automation_not_running",
         runtimeStatus: runtimeControl.status,
         message:
           runtimeControl.status === "paused"
             ? "Investo research is paused. Resume operations before starting new research."
             : "Investo research is stopped. Start operations before starting new research.",
+        executionMode: "human-approved",
         transactionExecuted: false,
       },
       {
@@ -70,11 +51,6 @@ export async function POST(request: Request) {
       },
     );
   }
-
-  const operationsStartedAt = Date.now();
-  let operationsActivityId: string | null = null;
-
-  const { supabase, user } = await requireInvestoUser();
 
   if (!hasCompleteInvestoAIConfiguration()) {
     return NextResponse.json(
@@ -135,14 +111,17 @@ export async function POST(request: Request) {
     );
   }
 
+  const operationsStartedAt = Date.now();
+
   let runId: string | null = null;
+  let operationsActivityId: string | null = null;
 
   try {
     operationsActivityId = await beginInvestoOperationsActivity({
-      supabase: operationsSupabase,
-      userId: operationsUser.id,
+      supabase,
+      userId: user.id,
       agentName: "company-research-committee",
-      subject: null,
+      subject: input.ticker?.trim().toUpperCase() || input.companyName.trim(),
     });
 
     runId = await beginInvestoAgentRun({
@@ -174,12 +153,6 @@ export async function POST(request: Request) {
       },
     });
 
-    await completeInvestoOperationsActivity({
-      supabase: operationsSupabase,
-      activityId: operationsActivityId,
-      startedAt: operationsStartedAt,
-    });
-
     await completeInvestoAgentRun({
       supabase,
       runId,
@@ -193,6 +166,12 @@ export async function POST(request: Request) {
         transactionExecuted: false,
       }),
       evidence: input.evidence,
+    });
+
+    await completeInvestoOperationsActivity({
+      supabase,
+      activityId: operationsActivityId,
+      startedAt: operationsStartedAt,
     });
 
     const savedReport = await saveCompletedResearch({
@@ -217,18 +196,17 @@ export async function POST(request: Request) {
       },
     );
   } catch (error) {
-    await failInvestoOperationsActivity({
-      supabase: operationsSupabase,
-      activityId: operationsActivityId,
-      startedAt: operationsStartedAt,
-      errorMessage:
-        error instanceof Error ? error.message : "Unknown research failure.",
-    });
-
     const message =
       error instanceof Error
         ? error.message
         : "The company research pipeline failed.";
+
+    await failInvestoOperationsActivity({
+      supabase,
+      activityId: operationsActivityId,
+      startedAt: operationsStartedAt,
+      errorMessage: message,
+    });
 
     if (runId) {
       await failInvestoAgentRun({

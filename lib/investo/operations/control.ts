@@ -40,10 +40,8 @@ type AgentActivityRow = {
 
 const RUNTIME_NAME = "investment-research";
 
-function operationsClient(supabase: SupabaseClient) {
-  return supabase as unknown as {
-    from: (table: string) => any;
-  };
+function operationsClient(supabase: SupabaseClient): SupabaseClient {
+  return supabase;
 }
 
 export async function getInvestoRuntimeControl(
