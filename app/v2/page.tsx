@@ -50,16 +50,19 @@ export default async function InvestoCommandCenterPage({
 
   return (
     <InvestoProtectedPage>
-      <section className="investo-page-heading">
+      <section className="investo-page-heading investo-command-hero">
         <div>
-          <p className="investo-eyebrow">Executive Command Center</p>
-          <h1>Capital allocation with discipline.</h1>
+          <p className="investo-eyebrow">Private Investment Office</p>
+          <h1>Investment decisions, prepared with discipline.</h1>
         </div>
 
-        <p>
-          Investo prepares research, valuation, portfolio risk, and investment
-          decisions while keeping every transaction under your approval.
-        </p>
+        <div className="investo-command-hero-summary">
+          <span>Executive overview</span>
+          <p>
+            Review capital, portfolio risk, investment opportunities, and
+            decisions requiring your approval from one operating view.
+          </p>
+        </div>
       </section>
 
       {params.setup === "complete" ? (
