@@ -18,13 +18,6 @@ type CommandCenterPageProps = {
   }>;
 };
 
-function currency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 export default async function InvestoCommandCenterPage({
   searchParams,
