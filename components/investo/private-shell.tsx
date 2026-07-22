@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/app/v2/actions";
+import { InvestoSessionTimeout } from "@/components/investo/session/InvestoSessionTimeout";
 
 const navigation = [
   {
@@ -38,7 +39,9 @@ export function InvestoPrivateShell({
   userEmail,
 }: PrivateShellProps) {
   return (
-    <div className="investo-private-shell">
+    <>
+      <InvestoSessionTimeout />
+      <div className="investo-private-shell">
       <aside className="investo-sidebar">
         <Link className="investo-sidebar-brand" href="/v2">
           <span className="investo-logo-mark">I</span>
@@ -84,6 +87,7 @@ export function InvestoPrivateShell({
 
         <main className="investo-private-content">{children}</main>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -810,3 +810,325 @@
     width: 100%;
   }
 }
+
+/* INVESTO OPERATIONS CONTROL START */
+
+.investo-operations-panel {
+  margin-bottom: 14px;
+  padding: 26px;
+  border: 1px solid var(--investo-border);
+  border-radius: 18px;
+  background:
+    radial-gradient(
+      circle at 88% 0%,
+      rgba(221, 196, 121, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.025),
+      transparent 50%
+    ),
+    var(--investo-panel);
+}
+
+.investo-operations-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.investo-operations-heading h2 {
+  margin: 6px 0 8px;
+  font-size: 24px;
+  font-weight: 560;
+  letter-spacing: -0.035em;
+}
+
+.investo-operations-heading > div:first-child > p:last-child {
+  max-width: 720px;
+  margin: 0;
+  color: var(--investo-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.investo-runtime-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+  padding: 9px 12px;
+  border: 1px solid var(--investo-border-strong);
+  border-radius: 999px;
+  color: var(--investo-soft);
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: capitalize;
+}
+
+.investo-runtime-status span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--investo-muted);
+}
+
+.investo-runtime-status-running span {
+  background: var(--investo-green);
+  box-shadow: 0 0 12px rgba(121, 200, 151, 0.65);
+}
+
+.investo-runtime-status-paused span {
+  background: var(--investo-gold);
+}
+
+.investo-runtime-status-stopped span {
+  background: #8f9891;
+}
+
+.investo-control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.investo-control-actions form {
+  margin: 0;
+}
+
+.investo-control-actions button {
+  min-width: 88px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--investo-border-strong);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--investo-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.investo-control-actions button:hover:not(:disabled) {
+  border-color: rgba(221, 196, 121, 0.48);
+  background: rgba(221, 196, 121, 0.08);
+  transform: translateY(-1px);
+}
+
+.investo-control-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.investo-control-actions .investo-control-stop {
+  border-color: rgba(223, 129, 123, 0.3);
+  color: #efb0ac;
+}
+
+.investo-control-boundary {
+  margin: 14px 0 0;
+  color: var(--investo-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.investo-operations-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 22px;
+  overflow: hidden;
+  border: 1px solid var(--investo-border);
+  border-radius: 14px;
+}
+
+.investo-operations-metrics > div {
+  min-width: 0;
+  padding: 18px;
+  border-right: 1px solid var(--investo-border);
+}
+
+.investo-operations-metrics > div:last-child {
+  border-right: 0;
+}
+
+.investo-operations-metrics span,
+.investo-operations-metrics strong {
+  display: block;
+}
+
+.investo-operations-metrics span {
+  color: var(--investo-muted);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.investo-operations-metrics strong {
+  margin-top: 10px;
+  font-size: 21px;
+  font-weight: 620;
+}
+
+.investo-operations-metrics .investo-small-value {
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.investo-agent-fleet {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--investo-border);
+}
+
+.investo-agent-fleet-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.investo-agent-fleet-heading h3 {
+  margin: 5px 0 0;
+  font-size: 18px;
+  font-weight: 560;
+}
+
+.investo-agent-fleet-heading > span {
+  color: var(--investo-muted);
+  font-size: 11px;
+}
+
+.investo-agent-empty {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px dashed var(--investo-border-strong);
+  border-radius: 12px;
+  color: var(--investo-muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.investo-agent-status {
+  display: inline-flex;
+  padding: 5px 8px;
+  border: 1px solid var(--investo-border);
+  border-radius: 999px;
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.investo-agent-status-running {
+  border-color: rgba(121, 200, 151, 0.28);
+  color: #b9e6c9;
+}
+
+.investo-agent-status-attention {
+  border-color: rgba(223, 129, 123, 0.3);
+  color: #efb0ac;
+}
+
+.investo-session-warning {
+  position: fixed;
+  z-index: 1000;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  max-width: 480px;
+  padding: 16px;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid rgba(221, 196, 121, 0.38);
+  border-radius: 14px;
+  background: #111811;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+}
+
+.investo-session-warning strong,
+.investo-session-warning span {
+  display: block;
+}
+
+.investo-session-warning strong {
+  font-size: 13px;
+}
+
+.investo-session-warning span {
+  margin-top: 4px;
+  color: var(--investo-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.investo-session-warning button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--investo-gold);
+  color: #17140a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .investo-operations-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .investo-operations-metrics > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .investo-operations-metrics > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--investo-border);
+  }
+}
+
+@media (max-width: 680px) {
+  .investo-operations-panel {
+    padding: 20px;
+  }
+
+  .investo-operations-heading,
+  .investo-agent-fleet-heading {
+    display: block;
+  }
+
+  .investo-runtime-status {
+    margin-top: 16px;
+  }
+
+  .investo-agent-fleet-heading > span {
+    display: block;
+    margin-top: 8px;
+  }
+
+  .investo-session-warning {
+    right: 14px;
+    bottom: 14px;
+    left: 14px;
+    display: block;
+  }
+
+  .investo-session-warning button {
+    width: 100%;
+    margin-top: 12px;
+  }
+}
+
+/* INVESTO OPERATIONS CONTROL END */
