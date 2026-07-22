@@ -14,6 +14,13 @@ function currency(value: number | null) {
   }).format(value ?? 0);
 }
 
+function percentage(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
 export default async function PortfolioPage() {
   const { supabase, user } = await requireInvestoUser();
 
@@ -66,6 +73,29 @@ export default async function PortfolioPage() {
     0,
   );
 
+  const totalCostBasis = holdings.reduce((total, holding) => {
+    const quantity = Number(holding.quantity ?? 0);
+    const averageCost = Number(holding.average_cost ?? 0);
+
+    return total + quantity * averageCost;
+  }, 0);
+
+  const unrealizedGain = portfolioValue - totalCostBasis;
+
+  const largestHolding = holdings[0] ?? null;
+
+  const largestPositionWeight =
+    portfolioValue > 0 && largestHolding
+      ? Number(largestHolding.market_value ?? 0) / portfolioValue
+      : 0;
+
+  const gainClass =
+    unrealizedGain > 0
+      ? "investo-value-positive"
+      : unrealizedGain < 0
+        ? "investo-value-negative"
+        : "";
+
   return (
     <InvestoProtectedPage>
       <section className="investo-page-heading">
@@ -75,27 +105,59 @@ export default async function PortfolioPage() {
         </div>
 
         <p>
-          Your holdings, allocation, account structure, cost basis, and
-          position-level investment conviction.
+          A clear view of current holdings, account structure, cost basis, and
+          portfolio concentration.
         </p>
       </section>
 
-      <section className="investo-metric-grid">
+      <section className="investo-metric-grid investo-portfolio-metrics">
         <article className="investo-card">
           <span className="investo-card-label">Portfolio Value</span>
           <strong className="investo-card-value">
             {currency(portfolioValue)}
           </strong>
           <span className="investo-card-detail">
-            Across all private accounts
+            Current recorded market value
           </span>
         </article>
 
         <article className="investo-card">
-          <span className="investo-card-label">Holdings</span>
+          <span className="investo-card-label">Cost Basis</span>
           <strong className="investo-card-value">
-            {holdings.length}
+            {currency(totalCostBasis)}
           </strong>
+          <span className="investo-card-detail">
+            Recorded acquisition value
+          </span>
+        </article>
+
+        <article className="investo-card">
+          <span className="investo-card-label">Unrealized Gain/Loss</span>
+          <strong className={`investo-card-value ${gainClass}`}>
+            {currency(unrealizedGain)}
+          </strong>
+          <span className="investo-card-detail">
+            Market value less cost basis
+          </span>
+        </article>
+
+        <article className="investo-card">
+          <span className="investo-card-label">Largest Position</span>
+          <strong className="investo-card-value">
+            {largestHolding?.symbol ?? "—"}
+          </strong>
+          <span className="investo-card-detail">
+            {largestHolding
+              ? `${percentage(largestPositionWeight)} of portfolio`
+              : "No position concentration yet"}
+          </span>
+        </article>
+      </section>
+
+      <section className="investo-portfolio-summary">
+        <article className="investo-card">
+          <span className="investo-card-label">Holdings</span>
+          <strong className="investo-card-value">{holdings.length}</strong>
           <span className="investo-card-detail">
             Active investment positions
           </span>
@@ -103,11 +165,9 @@ export default async function PortfolioPage() {
 
         <article className="investo-card">
           <span className="investo-card-label">Accounts</span>
-          <strong className="investo-card-value">
-            {accounts.length}
-          </strong>
+          <strong className="investo-card-value">{accounts.length}</strong>
           <span className="investo-card-detail">
-            IRA and taxable brokerage
+            Connected private accounts
           </span>
         </article>
 
@@ -117,7 +177,17 @@ export default async function PortfolioPage() {
             {portfolio.data?.benchmark_symbol ?? "SPY"}
           </strong>
           <span className="investo-card-detail">
-            Long-term performance comparison
+            Performance comparison
+          </span>
+        </article>
+
+        <article className="investo-card">
+          <span className="investo-card-label">Target Cash</span>
+          <strong className="investo-card-value">
+            {percentage(Number(portfolio.data?.target_cash_weight ?? 0))}
+          </strong>
+          <span className="investo-card-detail">
+            Portfolio cash target
           </span>
         </article>
       </section>
@@ -157,8 +227,7 @@ export default async function PortfolioPage() {
 
           {holdings.length === 0 ? (
             <div className="investo-empty-state">
-              No holdings have been imported yet. Portfolio entry and secure
-              CSV import will be added in the next phase.
+              No holdings have been recorded yet.
             </div>
           ) : (
             <div className="investo-table-wrap">
@@ -171,24 +240,50 @@ export default async function PortfolioPage() {
                     <th>Average Cost</th>
                     <th>Current Price</th>
                     <th>Market Value</th>
+                    <th>Gain/Loss</th>
+                    <th>Weight</th>
                     <th>Conviction</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {holdings.map((holding) => (
-                    <tr key={holding.id}>
-                      <td>
-                        <strong>{holding.symbol}</strong>
-                      </td>
-                      <td>{holding.asset_name ?? "—"}</td>
-                      <td>{Number(holding.quantity).toLocaleString()}</td>
-                      <td>{currency(Number(holding.average_cost ?? 0))}</td>
-                      <td>{currency(Number(holding.current_price ?? 0))}</td>
-                      <td>{currency(Number(holding.market_value ?? 0))}</td>
-                      <td>{holding.conviction ?? "Not rated"}</td>
-                    </tr>
-                  ))}
+                  {holdings.map((holding) => {
+                    const quantity = Number(holding.quantity ?? 0);
+                    const averageCost = Number(holding.average_cost ?? 0);
+                    const marketValue = Number(holding.market_value ?? 0);
+                    const positionCost = quantity * averageCost;
+                    const positionGain = marketValue - positionCost;
+                    const positionWeight =
+                      portfolioValue > 0 ? marketValue / portfolioValue : 0;
+
+                    return (
+                      <tr key={holding.id}>
+                        <td>
+                          <strong>{holding.symbol}</strong>
+                        </td>
+                        <td>{holding.asset_name ?? "—"}</td>
+                        <td>{quantity.toLocaleString()}</td>
+                        <td>{currency(averageCost)}</td>
+                        <td>
+                          {currency(Number(holding.current_price ?? 0))}
+                        </td>
+                        <td>{currency(marketValue)}</td>
+                        <td
+                          className={
+                            positionGain > 0
+                              ? "investo-value-positive"
+                              : positionGain < 0
+                                ? "investo-value-negative"
+                                : undefined
+                          }
+                        >
+                          {currency(positionGain)}
+                        </td>
+                        <td>{percentage(positionWeight)}</td>
+                        <td>{holding.conviction ?? "Not rated"}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

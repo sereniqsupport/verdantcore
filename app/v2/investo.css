@@ -1222,3 +1222,136 @@
 }
 
 /* INVESTO COMMAND HERO END */
+
+/* INVESTO PORTFOLIO DECISION FINISH START */
+
+.investo-portfolio-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 14px 0 28px;
+}
+
+.investo-value-positive {
+  color: #8fc9a3;
+}
+
+.investo-value-negative {
+  color: #e49a9a;
+}
+
+.investo-section-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.investo-section-heading-row h2 {
+  margin-bottom: 0;
+}
+
+.investo-decision-list {
+  display: grid;
+  gap: 12px;
+}
+
+.investo-decision-card {
+  padding: 18px;
+  border: 1px solid var(--investo-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.investo-decision-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.investo-decision-card-heading > div {
+  display: grid;
+  gap: 5px;
+}
+
+.investo-decision-card-heading strong {
+  font-size: 17px;
+  font-weight: 650;
+  text-transform: capitalize;
+}
+
+.investo-decision-symbol {
+  color: var(--investo-gold);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.investo-decision-card p {
+  max-width: 780px;
+  margin: 14px 0 16px;
+  color: var(--investo-soft);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.investo-decision-card footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 13px;
+  border-top: 1px solid var(--investo-border);
+  color: var(--investo-muted);
+  font-size: 11px;
+}
+
+.investo-decision-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 5px 9px;
+  border: 1px solid var(--investo-border);
+  border-radius: 999px;
+  color: var(--investo-soft);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.investo-decision-status-prepared {
+  border-color: rgba(221, 196, 121, 0.35);
+  color: var(--investo-gold);
+}
+
+.investo-decision-status-approved {
+  border-color: rgba(143, 201, 163, 0.35);
+  color: #8fc9a3;
+}
+
+.investo-decision-status-rejected {
+  border-color: rgba(228, 154, 154, 0.35);
+  color: #e49a9a;
+}
+
+@media (max-width: 1000px) {
+  .investo-portfolio-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .investo-portfolio-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .investo-section-heading-row,
+  .investo-decision-card-heading,
+  .investo-decision-card footer {
+    flex-direction: column;
+  }
+}
+
+/* INVESTO PORTFOLIO DECISION FINISH END */

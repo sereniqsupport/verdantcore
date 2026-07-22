@@ -12,6 +12,22 @@ function humanize(value: string) {
   return value.replaceAll("_", " ");
 }
 
+function statusClass(status: string) {
+  if (status === "prepared") {
+    return "investo-decision-status investo-decision-status-prepared";
+  }
+
+  if (status === "approved" || status === "executed") {
+    return "investo-decision-status investo-decision-status-approved";
+  }
+
+  if (status === "rejected") {
+    return "investo-decision-status investo-decision-status-rejected";
+  }
+
+  return "investo-decision-status";
+}
+
 export default async function DecisionsPage() {
   const { supabase, user } = await requireInvestoUser();
 
@@ -30,56 +46,117 @@ export default async function DecisionsPage() {
     (decision) => decision.status === "prepared",
   );
 
+  const recorded = decisions.filter(
+    (decision) => decision.status !== "prepared",
+  );
+
+  const executed = decisions.filter(
+    (decision) => Boolean(decision.executed_at),
+  );
+
   return (
     <InvestoProtectedPage>
       <section className="investo-page-heading">
         <div>
           <p className="investo-eyebrow">Human Approval</p>
-
           <h1>Decision Queue</h1>
         </div>
 
         <p>
-          Prepared investment decisions awaiting your judgment. No transaction
-          is executed here.
+          Review prepared investment actions and maintain a clear record of
+          prior decisions. No transaction is executed automatically.
         </p>
       </section>
 
       <section className="investo-metric-grid">
         <article className="investo-card">
           <span className="investo-card-label">Awaiting Review</span>
-
           <strong className="investo-card-value">{prepared.length}</strong>
-
-          <span className="investo-card-detail">Prepared decisions</span>
+          <span className="investo-card-detail">
+            Prepared decisions requiring judgment
+          </span>
         </article>
 
         <article className="investo-card">
           <span className="investo-card-label">Recorded Decisions</span>
-
-          <strong className="investo-card-value">{decisions.length}</strong>
-
-          <span className="investo-card-detail">Complete history</span>
+          <strong className="investo-card-value">{recorded.length}</strong>
+          <span className="investo-card-detail">
+            Approved, rejected, or completed
+          </span>
         </article>
 
         <article className="investo-card">
-          <span className="investo-card-label">Transactions Executed</span>
-
-          <strong className="investo-card-value">0</strong>
-
-          <span className="investo-card-detail">Human-controlled boundary</span>
+          <span className="investo-card-label">Executed Records</span>
+          <strong className="investo-card-value">{executed.length}</strong>
+          <span className="investo-card-detail">
+            Manually recorded execution history
+          </span>
         </article>
       </section>
 
       <section className="investo-section-stack">
         <article className="investo-card">
-          <p className="investo-eyebrow">Prepared Decisions</p>
+          <div className="investo-section-heading-row">
+            <div>
+              <p className="investo-eyebrow">Prepared Decisions</p>
+              <h2>Items requiring judgment</h2>
+            </div>
 
-          <h2>Items requiring judgment</h2>
+            <span className="investo-pill">{prepared.length} open</span>
+          </div>
 
-          {decisions.length === 0 ? (
+          {prepared.length === 0 ? (
             <div className="investo-empty-state">
-              No investment decisions have been prepared.
+              No investment decisions currently require review.
+            </div>
+          ) : (
+            <div className="investo-decision-list">
+              {prepared.map((decision) => (
+                <article className="investo-decision-card" key={decision.id}>
+                  <div className="investo-decision-card-heading">
+                    <div>
+                      <span className="investo-decision-symbol">
+                        {decision.symbol}
+                      </span>
+                      <strong>{humanize(decision.action)}</strong>
+                    </div>
+
+                    <span className={statusClass(decision.status)}>
+                      {humanize(decision.status)}
+                    </span>
+                  </div>
+
+                  <p>
+                    {decision.decision_note ??
+                      "Human review is required before any action is recorded."}
+                  </p>
+
+                  <footer>
+                    <span>
+                      Prepared{" "}
+                      {new Date(decision.created_at).toLocaleDateString()}
+                    </span>
+                    <span>No automatic execution</span>
+                  </footer>
+                </article>
+              ))}
+            </div>
+          )}
+        </article>
+
+        <article className="investo-card">
+          <div className="investo-section-heading-row">
+            <div>
+              <p className="investo-eyebrow">Decision History</p>
+              <h2>Recorded judgment</h2>
+            </div>
+
+            <span className="investo-pill">{recorded.length} recorded</span>
+          </div>
+
+          {recorded.length === 0 ? (
+            <div className="investo-empty-state">
+              No completed investment decisions have been recorded.
             </div>
           ) : (
             <div className="investo-table-wrap">
@@ -87,7 +164,7 @@ export default async function DecisionsPage() {
                 <thead>
                   <tr>
                     <th>Symbol</th>
-                    <th>Prepared Action</th>
+                    <th>Action</th>
                     <th>Status</th>
                     <th>Decision Note</th>
                     <th>Recorded</th>
@@ -96,27 +173,28 @@ export default async function DecisionsPage() {
                 </thead>
 
                 <tbody>
-                  {decisions.map((decision) => (
+                  {recorded.map((decision) => (
                     <tr key={decision.id}>
                       <td>
                         <strong>{decision.symbol}</strong>
                       </td>
-
                       <td>{humanize(decision.action)}</td>
-
-                      <td>{humanize(decision.status)}</td>
-
                       <td>
-                        {decision.decision_note ?? "Human review required"}
+                        <span className={statusClass(decision.status)}>
+                          {humanize(decision.status)}
+                        </span>
                       </td>
-
+                      <td>
+                        {decision.decision_note ?? "No decision note recorded"}
+                      </td>
                       <td>
                         {new Date(decision.created_at).toLocaleDateString()}
                       </td>
-
                       <td>
                         {decision.executed_at
-                          ? "Recorded as executed"
+                          ? new Date(
+                              decision.executed_at,
+                            ).toLocaleDateString()
                           : "Not executed"}
                       </td>
                     </tr>
