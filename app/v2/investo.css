@@ -1457,3 +1457,147 @@
 }
 
 /* INVESTO DECISION ACTION LAYER END */
+
+/* INVESTO HOLDINGS MANAGEMENT START */
+
+.investo-holding-entry-panel {
+  margin-bottom: 20px;
+}
+
+.investo-holding-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.investo-holding-form label,
+.investo-holding-edit-form label {
+  display: grid;
+  gap: 7px;
+}
+
+.investo-holding-form label > span,
+.investo-holding-edit-form label > span {
+  color: var(--investo-muted);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.investo-holding-form input,
+.investo-holding-form select,
+.investo-holding-edit-form input,
+.investo-holding-edit-form select {
+  min-height: 43px;
+  width: 100%;
+  padding: 0 12px;
+  border: 1px solid var(--investo-border);
+  border-radius: 9px;
+  outline: none;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--investo-text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.investo-holding-form input:focus,
+.investo-holding-form select:focus,
+.investo-holding-edit-form input:focus,
+.investo-holding-edit-form select:focus {
+  border-color: rgba(221, 196, 121, 0.48);
+}
+
+.investo-holding-form-wide {
+  grid-column: span 2;
+}
+
+.investo-holding-submit {
+  min-height: 43px;
+  align-self: end;
+  border: 1px solid rgba(221, 196, 121, 0.42);
+  border-radius: 9px;
+  cursor: pointer;
+  background: rgba(221, 196, 121, 0.08);
+  color: var(--investo-gold);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.investo-holding-submit:hover {
+  background: rgba(221, 196, 121, 0.13);
+}
+
+.investo-holding-manage {
+  position: relative;
+  min-width: 100px;
+}
+
+.investo-holding-manage summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--investo-gold);
+  font-size: 11px;
+  font-weight: 700;
+  list-style: none;
+}
+
+.investo-holding-manage summary::-webkit-details-marker {
+  display: none;
+}
+
+.investo-holding-manage[open] {
+  min-width: 240px;
+}
+
+.investo-holding-edit-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid var(--investo-border);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.investo-holding-edit-form button,
+.investo-holding-remove {
+  min-height: 38px;
+  border: 1px solid var(--investo-border);
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--investo-text);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.investo-holding-remove {
+  width: 100%;
+  margin-top: 8px;
+  border-color: rgba(228, 154, 154, 0.35);
+  color: #e9a5a5;
+}
+
+.investo-holding-edit-form button:hover,
+.investo-holding-remove:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+@media (max-width: 1100px) {
+  .investo-holding-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .investo-holding-form {
+    grid-template-columns: 1fr;
+  }
+
+  .investo-holding-form-wide {
+    grid-column: auto;
+  }
+}
+
+/* INVESTO HOLDINGS MANAGEMENT END */

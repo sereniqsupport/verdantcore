@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { InvestoProtectedPage } from "@/components/investo/protected-page";
 import { requireInvestoUser } from "@/lib/investo/auth";
+import {
+  addPortfolioHolding,
+  removePortfolioHolding,
+  updatePortfolioHolding,
+} from "@/app/v2/portfolio/actions";
 
 export const metadata: Metadata = {
   title: "Portfolio",
@@ -192,6 +197,122 @@ export default async function PortfolioPage() {
         </article>
       </section>
 
+      <section className="investo-card investo-holding-entry-panel">
+        <div className="investo-section-heading-row">
+          <div>
+            <p className="investo-eyebrow">Portfolio Entry</p>
+            <h2>Add an investment position</h2>
+          </div>
+
+          <span className="investo-pill">Manual entry</span>
+        </div>
+
+        {accounts.length === 0 ? (
+          <div className="investo-empty-state">
+            Create or initialize an investment account before adding holdings.
+          </div>
+        ) : (
+          <form action={addPortfolioHolding} className="investo-holding-form">
+            <label>
+              <span>Account</span>
+              <select defaultValue="" name="account_id" required>
+                <option disabled value="">
+                  Select account
+                </option>
+
+                {accounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              <span>Symbol</span>
+              <input
+                autoCapitalize="characters"
+                maxLength={15}
+                name="symbol"
+                placeholder="MSFT"
+                required
+              />
+            </label>
+
+            <label className="investo-holding-form-wide">
+              <span>Company or asset name</span>
+              <input
+                name="asset_name"
+                placeholder="Microsoft Corporation"
+              />
+            </label>
+
+            <label>
+              <span>Asset class</span>
+              <select defaultValue="equity" name="asset_class">
+                <option value="equity">Equity</option>
+                <option value="etf">ETF</option>
+                <option value="fund">Fund</option>
+                <option value="bond">Bond</option>
+                <option value="cash">Cash</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Quantity</span>
+              <input
+                min="0.000001"
+                name="quantity"
+                placeholder="10"
+                required
+                step="any"
+                type="number"
+              />
+            </label>
+
+            <label>
+              <span>Average cost</span>
+              <input
+                min="0.01"
+                name="average_cost"
+                placeholder="350.00"
+                required
+                step="0.01"
+                type="number"
+              />
+            </label>
+
+            <label>
+              <span>Current price</span>
+              <input
+                min="0.01"
+                name="current_price"
+                placeholder="425.00"
+                required
+                step="0.01"
+                type="number"
+              />
+            </label>
+
+            <label>
+              <span>Conviction</span>
+              <select defaultValue="Not rated" name="conviction">
+                <option value="Not rated">Not rated</option>
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+                <option value="Core">Core</option>
+              </select>
+            </label>
+
+            <button className="investo-holding-submit" type="submit">
+              Add position
+            </button>
+          </form>
+        )}
+      </section>
+
       <section className="investo-section-stack">
         <article className="investo-card">
           <p className="investo-eyebrow">Investment Accounts</p>
@@ -243,6 +364,7 @@ export default async function PortfolioPage() {
                     <th>Gain/Loss</th>
                     <th>Weight</th>
                     <th>Conviction</th>
+                    <th>Manage</th>
                   </tr>
                 </thead>
 
@@ -281,6 +403,93 @@ export default async function PortfolioPage() {
                         </td>
                         <td>{percentage(positionWeight)}</td>
                         <td>{holding.conviction ?? "Not rated"}</td>
+                        <td>
+                          <details className="investo-holding-manage">
+                            <summary>Manage</summary>
+
+                            <form
+                              action={updatePortfolioHolding}
+                              className="investo-holding-edit-form"
+                            >
+                              <input
+                                name="holding_id"
+                                type="hidden"
+                                value={holding.id}
+                              />
+
+                              <label>
+                                <span>Quantity</span>
+                                <input
+                                  defaultValue={quantity}
+                                  min="0.000001"
+                                  name="quantity"
+                                  required
+                                  step="any"
+                                  type="number"
+                                />
+                              </label>
+
+                              <label>
+                                <span>Average cost</span>
+                                <input
+                                  defaultValue={averageCost}
+                                  min="0.01"
+                                  name="average_cost"
+                                  required
+                                  step="0.01"
+                                  type="number"
+                                />
+                              </label>
+
+                              <label>
+                                <span>Current price</span>
+                                <input
+                                  defaultValue={Number(
+                                    holding.current_price ?? 0,
+                                  )}
+                                  min="0.01"
+                                  name="current_price"
+                                  required
+                                  step="0.01"
+                                  type="number"
+                                />
+                              </label>
+
+                              <label>
+                                <span>Conviction</span>
+                                <select
+                                  defaultValue={
+                                    holding.conviction ?? "Not rated"
+                                  }
+                                  name="conviction"
+                                >
+                                  <option value="Not rated">Not rated</option>
+                                  <option value="Low">Low</option>
+                                  <option value="Moderate">Moderate</option>
+                                  <option value="High">High</option>
+                                  <option value="Core">Core</option>
+                                </select>
+                              </label>
+
+                              <button type="submit">Save changes</button>
+                            </form>
+
+                            <form action={removePortfolioHolding}>
+                              <input
+                                name="holding_id"
+                                type="hidden"
+                                value={holding.id}
+                              />
+
+                              <button
+                                className="investo-holding-remove"
+                                type="submit"
+                              >
+                                Remove position
+                              </button>
+                            </form>
+                          </details>
+                        </td>
                       </tr>
                     );
                   })}
