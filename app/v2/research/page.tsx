@@ -36,7 +36,7 @@ export default async function ResearchPage({
   }
 
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-10 px-5 py-8 md:px-8 md:py-10">
+    <main className="investo-research-page mx-auto w-full max-w-7xl space-y-10 px-5 py-8 md:px-8 md:py-10">
       <CompanyResearchWorkspace initialTicker={initialTicker} />
 
       <ResearchHistory reports={reports} />
