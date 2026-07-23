@@ -1355,3 +1355,105 @@
 }
 
 /* INVESTO PORTFOLIO DECISION FINISH END */
+
+/* INVESTO DECISION ACTION LAYER START */
+
+.investo-decision-action-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 16px;
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--investo-border);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.investo-decision-action-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.investo-decision-action-form label > span {
+  color: var(--investo-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.investo-decision-action-form textarea {
+  min-height: 68px;
+  resize: vertical;
+  padding: 12px 13px;
+  border: 1px solid var(--investo-border);
+  border-radius: 10px;
+  outline: none;
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--investo-text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.investo-decision-action-form textarea:focus {
+  border-color: rgba(221, 196, 121, 0.5);
+}
+
+.investo-decision-actions {
+  display: flex;
+  gap: 9px;
+}
+
+.investo-decision-button,
+.investo-inline-action {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--investo-border);
+  border-radius: 9px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--investo-text);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.investo-decision-button-approve {
+  border-color: rgba(143, 201, 163, 0.42);
+  color: #9dd4af;
+}
+
+.investo-decision-button-reject {
+  border-color: rgba(228, 154, 154, 0.42);
+  color: #ecaaaa;
+}
+
+.investo-decision-button:hover,
+.investo-inline-action:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.investo-inline-action {
+  min-height: 34px;
+  padding: 0 12px;
+  border-color: rgba(221, 196, 121, 0.38);
+  color: var(--investo-gold);
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .investo-decision-action-form {
+    grid-template-columns: 1fr;
+  }
+
+  .investo-decision-actions {
+    width: 100%;
+  }
+
+  .investo-decision-button {
+    flex: 1;
+  }
+}
+
+/* INVESTO DECISION ACTION LAYER END */

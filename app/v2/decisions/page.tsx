@@ -3,6 +3,11 @@ import { InvestoProtectedPage } from "@/components/investo/protected-page";
 import { requireInvestoUser } from "@/lib/investo/auth";
 import { getDecisionQueue } from "@/lib/investo/research/repository";
 import type { InvestoDecision } from "@/lib/investo/database/types";
+import {
+  approveDecision,
+  recordDecisionExecution,
+  rejectDecision,
+} from "@/app/v2/decisions/actions";
 
 export const metadata: Metadata = {
   title: "Decision Queue",
@@ -131,12 +136,48 @@ export default async function DecisionsPage() {
                       "Human review is required before any action is recorded."}
                   </p>
 
+                  <form className="investo-decision-action-form">
+                    <input
+                      name="decision_id"
+                      type="hidden"
+                      value={decision.id}
+                    />
+
+                    <label>
+                      <span>Decision note</span>
+                      <textarea
+                        defaultValue={decision.decision_note ?? ""}
+                        name="decision_note"
+                        placeholder="Record the reason for your decision."
+                        rows={2}
+                      />
+                    </label>
+
+                    <div className="investo-decision-actions">
+                      <button
+                        className="investo-decision-button investo-decision-button-approve"
+                        formAction={approveDecision}
+                        type="submit"
+                      >
+                        Approve
+                      </button>
+
+                      <button
+                        className="investo-decision-button investo-decision-button-reject"
+                        formAction={rejectDecision}
+                        type="submit"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </form>
+
                   <footer>
                     <span>
                       Prepared{" "}
                       {new Date(decision.created_at).toLocaleDateString()}
                     </span>
-                    <span>No automatic execution</span>
+                    <span>Human approval required</span>
                   </footer>
                 </article>
               ))}
@@ -191,11 +232,25 @@ export default async function DecisionsPage() {
                         {new Date(decision.created_at).toLocaleDateString()}
                       </td>
                       <td>
-                        {decision.executed_at
-                          ? new Date(
-                              decision.executed_at,
-                            ).toLocaleDateString()
-                          : "Not executed"}
+                        {decision.executed_at ? (
+                          new Date(decision.executed_at).toLocaleDateString()
+                        ) : decision.status === "approved" ? (
+                          <form action={recordDecisionExecution}>
+                            <input
+                              name="decision_id"
+                              type="hidden"
+                              value={decision.id}
+                            />
+                            <button
+                              className="investo-inline-action"
+                              type="submit"
+                            >
+                              Record execution
+                            </button>
+                          </form>
+                        ) : (
+                          "Not executed"
+                        )}
                       </td>
                     </tr>
                   ))}
