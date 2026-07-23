@@ -1601,3 +1601,75 @@
 }
 
 /* INVESTO HOLDINGS MANAGEMENT END */
+
+/* INVESTO PORTFOLIO ACTION LEDGER START */
+
+.investo-portfolio-activity {
+  margin-bottom: 20px;
+}
+
+.investo-execution-entry {
+  min-width: 190px;
+}
+
+.investo-execution-entry summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--investo-gold);
+  font-size: 10px;
+  font-weight: 750;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.investo-execution-entry summary::-webkit-details-marker {
+  display: none;
+}
+
+.investo-execution-entry form {
+  display: grid;
+  gap: 10px;
+  min-width: 250px;
+  margin-top: 10px;
+  padding: 13px;
+  border: 1px solid var(--investo-border);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.investo-execution-entry label {
+  display: grid;
+  gap: 6px;
+}
+
+.investo-execution-entry label > span {
+  color: var(--investo-muted);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.investo-execution-entry input,
+.investo-execution-entry textarea {
+  width: 100%;
+  padding: 10px 11px;
+  border: 1px solid var(--investo-border);
+  border-radius: 8px;
+  outline: none;
+  background: rgba(0, 0, 0, 0.24);
+  color: var(--investo-text);
+  font: inherit;
+  font-size: 11px;
+}
+
+.investo-execution-entry textarea {
+  resize: vertical;
+}
+
+.investo-execution-entry input:focus,
+.investo-execution-entry textarea:focus {
+  border-color: rgba(221, 196, 121, 0.48);
+}
+
+/* INVESTO PORTFOLIO ACTION LEDGER END */

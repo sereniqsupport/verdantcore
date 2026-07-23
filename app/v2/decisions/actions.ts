@@ -57,7 +57,7 @@ async function updateDecision(
 
   const existing = await supabase
     .from(DECISION_TABLE)
-    .select("id, status, decision_note, executed_at")
+    .select("id, portfolio_id, symbol, action, status, decision_note, executed_at")
     .eq("id", decisionId)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -79,6 +79,73 @@ async function updateDecision(
     existing.data.status !== "prepared"
   ) {
     throw new Error("Only prepared decisions can be reviewed.");
+  }
+
+  if (action === "executed") {
+    const quantityValue = readOptionalString(formData, "quantity");
+    const priceValue = readOptionalString(formData, "execution_price");
+
+    const quantity =
+      quantityValue === null ? null : Number(quantityValue);
+
+    const executionPrice =
+      priceValue === null ? null : Number(priceValue);
+
+    if (
+      quantity !== null &&
+      (!Number.isFinite(quantity) || quantity <= 0)
+    ) {
+      throw new Error("Execution quantity must be greater than zero.");
+    }
+
+    if (
+      executionPrice !== null &&
+      (!Number.isFinite(executionPrice) || executionPrice <= 0)
+    ) {
+      throw new Error("Execution price must be greater than zero.");
+    }
+
+    const totalValue =
+      quantity !== null && executionPrice !== null
+        ? quantity * executionPrice
+        : null;
+
+    const actionTypeMap: Record<string, string> = {
+      buy: "buy",
+      sell: "sell",
+      add: "add",
+      trim: "trim",
+      exit: "exit",
+      hold: "hold",
+      watch: "watch",
+      no_action: "no_action",
+      record_no_action: "no_action",
+    };
+
+    const actionType =
+      actionTypeMap[existing.data.action] ?? "hold";
+
+    const ledgerResult = await supabase
+      .from("investo_portfolio_actions")
+      .insert({
+        user_id: user.id,
+        portfolio_id: existing.data.portfolio_id,
+        decision_id: existing.data.id,
+        symbol: existing.data.symbol,
+        action_type: actionType,
+        quantity,
+        execution_price: executionPrice,
+        total_value: totalValue,
+        execution_note:
+          decisionNote ??
+          existing.data.decision_note ??
+          "Execution recorded manually.",
+        executed_at: new Date().toISOString(),
+      });
+
+    if (ledgerResult.error) {
+      throw new Error(ledgerResult.error.message);
+    }
   }
 
   const update =

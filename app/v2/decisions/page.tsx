@@ -235,19 +235,55 @@ export default async function DecisionsPage() {
                         {decision.executed_at ? (
                           new Date(decision.executed_at).toLocaleDateString()
                         ) : decision.status === "approved" ? (
-                          <form action={recordDecisionExecution}>
-                            <input
-                              name="decision_id"
-                              type="hidden"
-                              value={decision.id}
-                            />
-                            <button
-                              className="investo-inline-action"
-                              type="submit"
-                            >
-                              Record execution
-                            </button>
-                          </form>
+                          <details className="investo-execution-entry">
+                            <summary>Record execution</summary>
+
+                            <form action={recordDecisionExecution}>
+                              <input
+                                name="decision_id"
+                                type="hidden"
+                                value={decision.id}
+                              />
+
+                              <label>
+                                <span>Quantity</span>
+                                <input
+                                  min="0.000001"
+                                  name="quantity"
+                                  placeholder="Optional"
+                                  step="any"
+                                  type="number"
+                                />
+                              </label>
+
+                              <label>
+                                <span>Execution price</span>
+                                <input
+                                  min="0.01"
+                                  name="execution_price"
+                                  placeholder="Optional"
+                                  step="0.01"
+                                  type="number"
+                                />
+                              </label>
+
+                              <label>
+                                <span>Execution note</span>
+                                <textarea
+                                  name="decision_note"
+                                  placeholder="Record broker, account, or execution details."
+                                  rows={2}
+                                />
+                              </label>
+
+                              <button
+                                className="investo-inline-action"
+                                type="submit"
+                              >
+                                Save execution
+                              </button>
+                            </form>
+                          </details>
                         ) : (
                           "Not executed"
                         )}

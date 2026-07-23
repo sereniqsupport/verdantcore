@@ -38,7 +38,7 @@ export default async function PortfolioPage() {
 
   const portfolioId = portfolio.data?.id ?? null;
 
-  const [accountsResult, holdingsResult] = portfolioId
+  const [accountsResult, holdingsResult, actionsResult] = portfolioId
     ? await Promise.all([
         supabase
           .from("investo_accounts")
@@ -58,8 +58,24 @@ export default async function PortfolioPage() {
             ascending: false,
             nullsFirst: false,
           }),
+
+        supabase
+          .from("investo_portfolio_actions")
+          .select(
+            "id, symbol, action_type, quantity, execution_price, total_value, execution_note, executed_at",
+          )
+          .eq("user_id", user.id)
+          .eq("portfolio_id", portfolioId)
+          .order("executed_at", {
+            ascending: false,
+          })
+          .limit(10),
       ])
     : [
+        {
+          data: [],
+          error: null,
+        },
         {
           data: [],
           error: null,
@@ -72,6 +88,7 @@ export default async function PortfolioPage() {
 
   const accounts = accountsResult.data ?? [];
   const holdings = holdingsResult.data ?? [];
+  const portfolioActions = actionsResult.data ?? [];
 
   const portfolioValue = holdings.reduce(
     (total, holding) => total + Number(holding.market_value ?? 0),
@@ -195,6 +212,71 @@ export default async function PortfolioPage() {
             Portfolio cash target
           </span>
         </article>
+      </section>
+
+      <section className="investo-card investo-portfolio-activity">
+        <div className="investo-section-heading-row">
+          <div>
+            <p className="investo-eyebrow">Portfolio Activity</p>
+            <h2>Recent action records</h2>
+          </div>
+
+          <span className="investo-pill">
+            {portfolioActions.length} recent
+          </span>
+        </div>
+
+        {portfolioActions.length === 0 ? (
+          <div className="investo-empty-state">
+            No portfolio actions have been recorded yet.
+          </div>
+        ) : (
+          <div className="investo-table-wrap">
+            <table className="investo-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Symbol</th>
+                  <th>Action</th>
+                  <th>Quantity</th>
+                  <th>Execution Price</th>
+                  <th>Total Value</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {portfolioActions.map((action) => (
+                  <tr key={action.id}>
+                    <td>
+                      {new Date(action.executed_at).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <strong>{action.symbol}</strong>
+                    </td>
+                    <td>{action.action_type.replaceAll("_", " ")}</td>
+                    <td>
+                      {action.quantity === null
+                        ? "—"
+                        : Number(action.quantity).toLocaleString()}
+                    </td>
+                    <td>
+                      {action.execution_price === null
+                        ? "—"
+                        : currency(Number(action.execution_price))}
+                    </td>
+                    <td>
+                      {action.total_value === null
+                        ? "—"
+                        : currency(Number(action.total_value))}
+                    </td>
+                    <td>{action.execution_note ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="investo-card investo-holding-entry-panel">
