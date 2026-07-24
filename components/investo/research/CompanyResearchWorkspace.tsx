@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 import { EvidenceEditor } from "@/components/investo/research/EvidenceEditor";
 import { ResearchResults } from "@/components/investo/research/ResearchResults";
 import { createEvidenceDraft } from "@/components/investo/research/research-format";
@@ -45,24 +45,14 @@ export function CompanyResearchWorkspace({
   const [companyName, setCompanyName] = useState("");
   const [ticker, setTicker] = useState(initialTicker);
   const [researchQuestion, setResearchQuestion] = useState("");
-  const [evidence, setEvidence] = useState<EvidenceDraft[]>([
-    createEvidenceDraft(),
-  ]);
+  const [evidence, setEvidence] = useState<EvidenceDraft[]>([]);
   const [researchState, setResearchState] = useState<ResearchState>({
     status: "idle",
   });
 
   const isRunning = researchState.status === "running";
 
-  const evidenceReady = useMemo(
-    () =>
-      evidence.length > 0 &&
-      evidence.every((item) => item.title.trim().length > 0),
-    [evidence],
-  );
-
-  const canSubmit =
-    companyName.trim().length > 0 && evidenceReady && !isRunning;
+  const canSubmit = companyName.trim().length > 0 && !isRunning;
 
   async function submitResearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -121,7 +111,7 @@ export function CompanyResearchWorkspace({
     setCompanyName("");
     setTicker("");
     setResearchQuestion("");
-    setEvidence([createEvidenceDraft()]);
+    setEvidence([]);
     setResearchState({
       status: "idle",
     });
@@ -222,27 +212,76 @@ export function CompanyResearchWorkspace({
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-white/[0.025] p-6 md:p-8">
-          <div>
-            <h2 className="text-lg font-semibold text-white">
-              Evidence Packet
-            </h2>
+        <section className="rounded-3xl border border-amber-200/25 bg-amber-100/[0.055] p-6 md:p-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-amber-100/55">
+                Company Research
+              </p>
 
-            <p className="mt-2 text-sm leading-6 text-white/45">
-              Add filings, earnings material, financial facts, operating
-              metrics, or other verified evidence. Investo will not fill missing
-              facts through assumptions.
-            </p>
-          </div>
+              <h2 className="mt-2 text-lg font-semibold text-white">
+                Begin the financial review
+              </h2>
 
-          <div className="mt-6">
-            <EvidenceEditor
-              evidence={evidence}
-              onChange={setEvidence}
-              disabled={isRunning}
-            />
+              <p className="mt-2 text-sm leading-6 text-white/50">
+                Investo will review the company, assess its financial position,
+                test the investment case, and prepare an Investment Conclusion
+                for your approval.
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className="rounded-xl bg-amber-100 px-6 py-3 text-sm font-semibold text-black transition hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-35"
+            >
+              {isRunning
+                ? "Preparing the financial review..."
+                : "Begin Research"}
+            </button>
           </div>
         </section>
+
+        <details className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.025]">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-5 px-6 py-5 md:px-8">
+            <span>
+              <strong className="block text-sm font-semibold text-white">
+                Supporting Documents
+              </strong>
+
+              <small className="mt-1 block text-xs leading-5 text-white/40">
+                Optional information you want included in the review
+              </small>
+            </span>
+
+            <span className="rounded-full border border-white/10 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-white/40">
+              Optional
+            </span>
+          </summary>
+
+          <div className="border-t border-white/10">
+            <section className="rounded-3xl border border-white/10 bg-white/[0.025] p-6 md:p-8">
+              <div>
+                <h2 className="text-lg font-semibold text-white">
+                  Supporting Documents
+                </h2>
+
+                <p className="mt-2 text-sm leading-6 text-white/45">
+                  Add a company filing, business document, or verified fact only
+                  when you want it included in the review.
+                </p>
+              </div>
+
+              <div className="mt-6">
+                <EvidenceEditor
+                  evidence={evidence}
+                  onChange={setEvidence}
+                  disabled={isRunning}
+                />
+              </div>
+            </section>
+          </div>
+        </details>
 
         {researchState.status === "failed" ? (
           <section className="rounded-2xl border border-red-400/25 bg-red-400/[0.08] p-5">
@@ -282,7 +321,9 @@ export function CompanyResearchWorkspace({
               disabled={!canSubmit}
               className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-35"
             >
-              {isRunning ? "Running committee review..." : "Run company review"}
+              {isRunning
+                ? "Preparing the financial review..."
+                : "Begin Research"}
             </button>
           </div>
         </section>
@@ -298,7 +339,7 @@ export function CompanyResearchWorkspace({
 
             <div>
               <p className="text-sm font-medium text-white">
-                Investment committee review in progress
+                Financial review in progress
               </p>
 
               <p className="mt-1 text-sm text-white/45">

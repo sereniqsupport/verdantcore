@@ -4,6 +4,7 @@ import { requireInvestoUser } from "@/lib/investo/auth";
 import { getResearchHistory } from "@/lib/investo/research/repository";
 import type { InvestoResearchReport } from "@/lib/investo/database/types";
 
+import { InvestoProtectedPage } from "@/components/investo/protected-page";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -36,10 +37,12 @@ export default async function ResearchPage({
   }
 
   return (
-    <main className="investo-research-page mx-auto w-full max-w-7xl space-y-10 px-5 py-8 md:px-8 md:py-10">
-      <CompanyResearchWorkspace initialTicker={initialTicker} />
+    <InvestoProtectedPage>
+      <main className="investo-research-page w-full space-y-10">
+        <CompanyResearchWorkspace initialTicker={initialTicker} />
 
-      <ResearchHistory reports={reports} />
-    </main>
+        <ResearchHistory reports={reports} />
+      </main>
+    </InvestoProtectedPage>
   );
 }

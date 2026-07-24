@@ -1,9 +1,5 @@
-import type {
-  CompanyResearchRequest,
-} from "@/lib/investo/agents/company-research-types";
-import type {
-  InvestoAgentEvidence,
-} from "@/lib/investo/ai/types";
+import type { CompanyResearchRequest } from "@/lib/investo/agents/company-research-types";
+import type { InvestoAgentEvidence } from "@/lib/investo/ai/types";
 
 const MAX_COMPANY_NAME_LENGTH = 160;
 const MAX_TICKER_LENGTH = 20;
@@ -32,9 +28,7 @@ function readOptionalString(
   }
 
   if (normalized.length > maximumLength) {
-    throw new Error(
-      `${field} exceeds the ${maximumLength}-character limit.`,
-    );
+    throw new Error(`${field} exceeds the ${maximumLength}-character limit.`);
   }
 
   return normalized;
@@ -45,11 +39,7 @@ function readRequiredString(
   field: string,
   maximumLength: number,
 ) {
-  const normalized = readOptionalString(
-    value,
-    field,
-    maximumLength,
-  );
+  const normalized = readOptionalString(value, field, maximumLength);
 
   if (!normalized) {
     throw new Error(`${field} is required.`);
@@ -58,43 +48,23 @@ function readRequiredString(
   return normalized;
 }
 
-function readEvidenceString(
-  value: unknown,
-  field: string,
-) {
-  return readOptionalString(
-    value,
-    field,
-    MAX_EVIDENCE_FIELD_LENGTH,
-  );
+function readEvidenceString(value: unknown, field: string) {
+  return readOptionalString(value, field, MAX_EVIDENCE_FIELD_LENGTH);
 }
 
 function validateEvidenceItem(
   value: unknown,
   index: number,
 ): InvestoAgentEvidence {
-  if (
-    !value ||
-    typeof value !== "object" ||
-    Array.isArray(value)
-  ) {
-    throw new Error(
-      `evidence[${index}] must be an object.`,
-    );
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`evidence[${index}] must be an object.`);
   }
 
   const item = value as Record<string, unknown>;
 
   return {
-    title: readRequiredString(
-      item.title,
-      `evidence[${index}].title`,
-      500,
-    ),
-    source: readEvidenceString(
-      item.source,
-      `evidence[${index}].source`,
-    ),
+    title: readRequiredString(item.title, `evidence[${index}].title`, 500),
+    source: readEvidenceString(item.source, `evidence[${index}].source`),
     sourceUrl: readEvidenceString(
       item.sourceUrl,
       `evidence[${index}].sourceUrl`,
@@ -103,42 +73,22 @@ function validateEvidenceItem(
       item.publishedAt,
       `evidence[${index}].publishedAt`,
     ),
-    dataAsOf: readEvidenceString(
-      item.dataAsOf,
-      `evidence[${index}].dataAsOf`,
-    ),
-    note: readEvidenceString(
-      item.note,
-      `evidence[${index}].note`,
-    ),
+    dataAsOf: readEvidenceString(item.dataAsOf, `evidence[${index}].dataAsOf`),
+    note: readEvidenceString(item.note, `evidence[${index}].note`),
   };
 }
 
 export function validateCompanyResearchRequest(
   value: unknown,
 ): CompanyResearchRequest {
-  if (
-    !value ||
-    typeof value !== "object" ||
-    Array.isArray(value)
-  ) {
-    throw new Error(
-      "The company research request must be an object.",
-    );
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("The company research request must be an object.");
   }
 
   const input = value as Record<string, unknown>;
 
   if (!Array.isArray(input.evidence)) {
-    throw new Error(
-      "evidence must be an array of verified source records.",
-    );
-  }
-
-  if (input.evidence.length === 0) {
-    throw new Error(
-      "At least one verified evidence record is required.",
-    );
+    throw new Error("evidence must be an array of verified source records.");
   }
 
   if (input.evidence.length > MAX_EVIDENCE_ITEMS) {
@@ -147,28 +97,20 @@ export function validateCompanyResearchRequest(
     );
   }
 
-  const evidence = input.evidence.map(
-    validateEvidenceItem,
-  );
+  const evidence = input.evidence.map(validateEvidenceItem);
 
   const totalEvidenceCharacters = evidence.reduce(
     (total, item) =>
       total +
       Object.values(item).reduce(
         (itemTotal, field) =>
-          itemTotal +
-          (typeof field === "string"
-            ? field.length
-            : 0),
+          itemTotal + (typeof field === "string" ? field.length : 0),
         0,
       ),
     0,
   );
 
-  if (
-    totalEvidenceCharacters >
-    MAX_TOTAL_EVIDENCE_CHARACTERS
-  ) {
+  if (totalEvidenceCharacters > MAX_TOTAL_EVIDENCE_CHARACTERS) {
     throw new Error(
       `The evidence packet exceeds the ${MAX_TOTAL_EVIDENCE_CHARACTERS}-character limit.`,
     );

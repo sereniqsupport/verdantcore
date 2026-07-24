@@ -1,11 +1,7 @@
 "use client";
 
-import type {
-  EvidenceDraft,
-} from "@/components/investo/research/types";
-import {
-  createEvidenceDraft,
-} from "@/components/investo/research/research-format";
+import type { EvidenceDraft } from "@/components/investo/research/types";
+import { createEvidenceDraft } from "@/components/investo/research/research-format";
 
 type EvidenceEditorProps = {
   evidence: EvidenceDraft[];
@@ -43,19 +39,16 @@ export function EvidenceEditor({
         >
           <div className="flex items-center justify-between gap-4">
             <h3 className="text-sm font-medium text-white">
-              Evidence {index + 1}
+              Document {index + 1}
             </h3>
 
-            {evidence.length > 1 ? (
+            {evidence.length > 0 ? (
               <button
                 type="button"
                 disabled={disabled}
                 onClick={() =>
                   onChange(
-                    evidence.filter(
-                      (candidate) =>
-                        candidate.id !== item.id,
-                    ),
+                    evidence.filter((candidate) => candidate.id !== item.id),
                   )
                 }
                 className="text-xs text-white/40 transition hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-40"
@@ -68,11 +61,10 @@ export function EvidenceEditor({
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
               <span className="text-xs font-medium text-white/55">
-                Evidence title *
+                Document title
               </span>
 
               <input
-                required
                 disabled={disabled}
                 value={item.title}
                 onChange={(event) =>
@@ -91,9 +83,7 @@ export function EvidenceEditor({
             </label>
 
             <label className="space-y-2">
-              <span className="text-xs font-medium text-white/55">
-                Source
-              </span>
+              <span className="text-xs font-medium text-white/55">Source</span>
 
               <input
                 disabled={disabled}
@@ -185,7 +175,7 @@ export function EvidenceEditor({
 
             <label className="space-y-2 md:col-span-2">
               <span className="text-xs font-medium text-white/55">
-                Verified facts and relevant excerpts
+                Relevant facts or excerpts
               </span>
 
               <textarea
@@ -213,15 +203,10 @@ export function EvidenceEditor({
       <button
         type="button"
         disabled={disabled || evidence.length >= 30}
-        onClick={() =>
-          onChange([
-            ...evidence,
-            createEvidenceDraft(),
-          ])
-        }
+        onClick={() => onChange([...evidence, createEvidenceDraft()])}
         className="rounded-xl border border-white/15 px-4 py-2.5 text-sm text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Add evidence
+        Add supporting document
       </button>
     </div>
   );
