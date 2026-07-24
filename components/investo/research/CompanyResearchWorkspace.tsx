@@ -3,7 +3,6 @@
 import { FormEvent, useState } from "react";
 import { EvidenceEditor } from "@/components/investo/research/EvidenceEditor";
 import { ResearchResults } from "@/components/investo/research/ResearchResults";
-import { createEvidenceDraft } from "@/components/investo/research/research-format";
 import type {
   CompanyResearchResponse,
   EvidenceDraft,
