@@ -8,6 +8,10 @@ const navigation = [
     label: "Command Center",
   },
   {
+    href: "/v2/strategies",
+    label: "Investment Direction",
+  },
+  {
     href: "/v2/portfolio",
     label: "Portfolio",
   },

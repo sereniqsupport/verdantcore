@@ -15,6 +15,12 @@ function currency(value: number) {
 
 const workspaceLinks = [
   {
+    href: "/v2/strategies",
+    label: "Investment Direction",
+    description:
+      "Separate protective, enterprising, and swing capital decisions.",
+  },
+  {
     href: "/v2/portfolio",
     label: "Portfolio",
     description: "Review holdings, account structure, allocation, and conviction.",
