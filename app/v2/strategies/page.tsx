@@ -1,178 +1,324 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { InvestoProtectedPage } from "@/components/investo/protected-page";
+import { requireInvestoUser } from "@/lib/investo/auth";
+import {
+  loadStrategyDirectionOverview,
+  type InvestoStrategyCode,
+  type StrategyDirectionRow,
+} from "@/lib/investo/strategy/repository";
 
 export const metadata: Metadata = {
   title: "Investment Direction",
 };
 
-const investmentDirections = [
+const strategyGuidance: Record<
+  InvestoStrategyCode,
   {
-    name: "Protective Investing",
+    horizon: string;
+    purpose: string;
+    decisions: string;
+  }
+> = {
+  protective: {
     horizon: "Long term",
-    purpose: "Protect capital, build dependable income, and compound wealth with measured risk.",
-    appropriateFor:
-      "Core portfolio capital that should remain durable across changing market conditions.",
-    assetFocus: [
-      "U.S. Treasury securities and high-quality bonds",
-      "Durable, financially strong companies",
-      "Diversified funds and selected income securities",
-      "Cash reserves for protection and future opportunities",
-    ],
-    direction: [
-      "Favor financial strength and dependable cash flow",
-      "Limit portfolio concentration",
-      "Require an acceptable purchase price",
-      "Review periodically rather than react to daily market noise",
-    ],
+    purpose:
+      "Protect capital, build dependable income, and compound wealth with measured risk.",
     decisions: "Hold, Add, Reduce, Rebalance, or Exit",
   },
-  {
-    name: "Enterprising Investing",
+  enterprising: {
     horizon: "Long term",
     purpose:
-      "Pursue deeply researched opportunities that may offer stronger long-term returns.",
-    appropriateFor:
-      "Capital assigned to undervalued companies, selected credit opportunities, and market dislocations.",
-    assetFocus: [
-      "Undervalued public companies",
-      "Temporarily misunderstood businesses",
-      "Selected corporate bonds and special situations",
-      "High-quality companies purchased with a margin of safety",
-    ],
-    direction: [
-      "Require deeper financial and competitive research",
-      "Separate temporary weakness from permanent impairment",
-      "Define the investment case before allocating capital",
-      "Limit position size when uncertainty is elevated",
-    ],
+      "Pursue deeply researched opportunities that offer an acceptable margin of safety.",
     decisions: "Research, Prepare, Buy, Add, Hold, Reduce, or Exit",
   },
-  {
-    name: "Swing Opportunities",
+  swing: {
     horizon: "Weeks to months",
     purpose:
-      "Capture measured mid-term opportunities without disturbing the long-term portfolio.",
-    appropriateFor:
-      "A separately controlled portion of capital with clear entry, risk, and exit rules.",
-    assetFocus: [
-      "Stocks and exchange-traded securities",
-      "Sector rotation and valuation recovery opportunities",
-      "Earnings, credit, and market-condition changes",
-      "Price moves supported by verified business or market evidence",
-    ],
-    direction: [
-      "Define the entry range before action",
-      "Set the maximum capital at risk",
-      "Record the expected holding period",
-      "Establish review and exit conditions in advance",
-    ],
+      "Capture controlled medium-term opportunities without disturbing long-term capital.",
     decisions: "Prepare, Enter, Hold, Reduce, Exit, or Decline",
   },
-] as const;
+  reserve: {
+    horizon: "Available capital",
+    purpose:
+      "Preserve liquidity for protection, planned purchases, and future opportunities.",
+    decisions: "Hold, Rebalance, Deploy, or Replenish",
+  },
+};
 
-export default function InvestmentDirectionPage() {
+function currency(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function percentage(value: number) {
+  return `${value.toFixed(1)}%`;
+}
+
+function StrategyCard({
+  strategy,
+}: {
+  strategy: StrategyDirectionRow;
+}) {
+  const guidance = strategyGuidance[strategy.sleeve.code];
+  const target = Number(
+    strategy.policy?.target_allocation_percent ?? 0,
+  );
+  const maximum = Number(
+    strategy.policy?.maximum_allocation_percent ?? 0,
+  );
+
+  const allocationStatus =
+    strategy.portfolioAllocationPercent > maximum && maximum > 0
+      ? "Above policy"
+      : strategy.portfolioAllocationPercent < target
+        ? "Below target"
+        : "Within range";
+
+  return (
+    <article className="investo-card">
+      <div className="investo-section-heading-row">
+        <div>
+          <span className="investo-card-label">
+            {guidance.horizon}
+          </span>
+          <h2>{strategy.sleeve.name}</h2>
+        </div>
+
+        <span className="investo-pill">{allocationStatus}</span>
+      </div>
+
+      <p>{strategy.sleeve.description ?? guidance.purpose}</p>
+
+      <div className="investo-prepared-list">
+        <div className="investo-prepared-row">
+          <span>CAPITAL</span>
+          <div>
+            <strong>
+              {currency(strategy.assignedMarketValue)}
+            </strong>
+            <small>
+              {percentage(strategy.portfolioAllocationPercent)} of
+              the recorded portfolio
+            </small>
+          </div>
+        </div>
+
+        <div className="investo-prepared-row">
+          <span>POLICY</span>
+          <div>
+            <strong>
+              Target {percentage(target)} · Maximum{" "}
+              {percentage(maximum)}
+            </strong>
+            <small>
+              Review{" "}
+              {strategy.policy?.review_cadence ?? "Not configured"} ·{" "}
+              {strategy.policy?.expected_holding_period ??
+                guidance.horizon}
+            </small>
+          </div>
+        </div>
+
+        <div className="investo-prepared-row">
+          <span>POSITIONS</span>
+          <div>
+            <strong>
+              {strategy.assignedHoldingCount} assigned holdings
+            </strong>
+            <small>
+              Standard position{" "}
+              {percentage(
+                Number(
+                  strategy.positionControl
+                    ?.standard_position_percent ?? 0,
+                ),
+              )}{" "}
+              · Maximum{" "}
+              {percentage(
+                Number(
+                  strategy.positionControl
+                    ?.maximum_position_percent ??
+                    strategy.policy?.maximum_position_percent ??
+                    0,
+                ),
+              )}
+            </small>
+          </div>
+        </div>
+
+        <div className="investo-prepared-row">
+          <span>REVIEW</span>
+          <div>
+            <strong>
+              {strategy.activeConditionCount} prepared conditions ·{" "}
+              {strategy.activeSignalCount} active signals
+            </strong>
+            <small>{guidance.decisions}</small>
+          </div>
+
+          <span className="investo-pill">Human approved</span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default async function InvestmentDirectionPage() {
+  const { supabase, user } = await requireInvestoUser();
+  const overview = await loadStrategyDirectionOverview(
+    supabase,
+    user.id,
+  );
+
   return (
     <InvestoProtectedPage>
       <section className="investo-page-heading">
         <div>
           <p className="investo-eyebrow">Portfolio Direction</p>
-          <h1>Choose how each portion of capital should work.</h1>
+          <h1>Give every portion of capital a clear purpose.</h1>
         </div>
 
         <p>
-          Separate long-term protection, long-term opportunity, and mid-term
-          trading so every decision has a clear purpose and time horizon.
+          Separate capital protection, long-term opportunity,
+          controlled swing trades, and reserve cash without replacing
+          the holdings already recorded in Investo.
         </p>
       </section>
 
-      <section className="investo-metric-grid">
-        {investmentDirections.map((direction) => (
-          <article className="investo-card" key={direction.name}>
-            <span className="investo-card-label">{direction.horizon}</span>
-            <h2>{direction.name}</h2>
-            <p>{direction.purpose}</p>
-
-            <div className="investo-prepared-list">
-              <div className="investo-prepared-row">
-                <span>PURPOSE</span>
-                <div>
-                  <strong>Portfolio role</strong>
-                  <small>{direction.appropriateFor}</small>
-                </div>
-              </div>
-
-              <div className="investo-prepared-row">
-                <span>ASSETS</span>
-                <div>
-                  <strong>Investment focus</strong>
-                  {direction.assetFocus.map((item) => (
-                    <small key={item}>{item}</small>
-                  ))}
-                </div>
-              </div>
-
-              <div className="investo-prepared-row">
-                <span>RULES</span>
-                <div>
-                  <strong>Decision discipline</strong>
-                  {direction.direction.map((item) => (
-                    <small key={item}>{item}</small>
-                  ))}
-                </div>
-              </div>
-
-              <div className="investo-prepared-row">
-                <span>ACTIONS</span>
-                <div>
-                  <strong>{direction.decisions}</strong>
-                  <small>Every final investment decision requires human approval.</small>
-                </div>
-                <span className="investo-pill">Human approved</span>
-              </div>
-            </div>
-          </article>
-        ))}
-      </section>
-
-      <section className="investo-work-grid">
-        <article className="investo-card">
-          <p className="investo-eyebrow">Portfolio Separation</p>
-          <h2>Long-term investments and swing trades remain distinct.</h2>
+      {!overview.databaseReady ? (
+        <section className="investo-card">
+          <p className="investo-eyebrow">Database Update Required</p>
+          <h2>Apply the Phase 3 strategy migrations.</h2>
           <p>
-            A swing opportunity cannot silently become a long-term holding.
-            A protective investment cannot be treated as a short-term trade.
-            Each future recommendation will state its strategy, intended holding
-            period, portfolio effect, and conditions for review.
+            The Investment Direction page is ready, but the new
+            strategy tables have not yet been applied to Supabase.
+            Existing portfolio records remain available and unchanged.
           </p>
-        </article>
-
-        <article className="investo-card">
-          <p className="investo-eyebrow">Decision Control</p>
-          <h2>Investo prepares direction. You authorize action.</h2>
+        </section>
+      ) : overview.portfolioId === null ? (
+        <section className="investo-card">
+          <p className="investo-eyebrow">Portfolio Setup</p>
+          <h2>Initialize your primary portfolio first.</h2>
           <p>
-            Research, market signals, and portfolio analysis may prepare a
-            recommendation. No purchase, sale, allocation change, or trade may
-            occur without your approval.
-          </p>
-        </article>
-      </section>
-
-      <section className="investo-section-stack">
-        <article className="investo-card">
-          <p className="investo-eyebrow">Next Portfolio Step</p>
-          <h2>Review the holdings already recorded in Investo.</h2>
-          <p>
-            Existing portfolio records remain unchanged. Strategy assignments
-            will be added later as an additional classification without replacing
-            the current holdings structure.
+            Strategy direction will become available after Investo
+            creates your primary portfolio and investment accounts.
           </p>
 
-          <Link className="investo-pill" href="/v2/portfolio">
-            Review Portfolio
+          <Link className="investo-pill" href="/v2">
+            Open Command Center
           </Link>
-        </article>
-      </section>
+        </section>
+      ) : (
+        <>
+          <section className="investo-metric-grid">
+            <article className="investo-card">
+              <span className="investo-card-label">
+                Portfolio
+              </span>
+              <h2>{overview.portfolioName}</h2>
+              <p>
+                {currency(overview.totalPortfolioValue)} in recorded
+                holdings.
+              </p>
+            </article>
+
+            <article className="investo-card">
+              <span className="investo-card-label">
+                Strategy Coverage
+              </span>
+              <h2>{overview.strategies.length} capital sleeves</h2>
+              <p>
+                Protective, enterprising, swing, and reserve capital
+                remain separately governed.
+              </p>
+            </article>
+
+            <article className="investo-card">
+              <span className="investo-card-label">
+                Classification
+              </span>
+              <h2>
+                {overview.unassignedHoldingCount} unassigned holdings
+              </h2>
+              <p>
+                Holdings remain unchanged until a strategy
+                classification is explicitly approved.
+              </p>
+            </article>
+
+            <article className="investo-card">
+              <span className="investo-card-label">
+                Decision Control
+              </span>
+              <h2>Human approval required</h2>
+              <p>
+                Signals and prepared conditions cannot execute a trade
+                or change an allocation.
+              </p>
+            </article>
+          </section>
+
+          <section className="investo-metric-grid">
+            {overview.strategies.map((strategy) => (
+              <StrategyCard
+                key={strategy.sleeve.id}
+                strategy={strategy}
+              />
+            ))}
+          </section>
+
+          <section className="investo-work-grid">
+            <article className="investo-card">
+              <p className="investo-eyebrow">
+                Portfolio Separation
+              </p>
+              <h2>
+                Long-term investments and swing trades remain
+                distinct.
+              </h2>
+              <p>
+                Strategy assignments classify existing holdings
+                without replacing holdings, accounts, transactions,
+                research, or approval records.
+              </p>
+            </article>
+
+            <article className="investo-card">
+              <p className="investo-eyebrow">Decision Control</p>
+              <h2>
+                Investo prepares direction. You authorize action.
+              </h2>
+              <p>
+                Market signals, position limits, and prepared
+                conditions support judgment. They do not authorize
+                purchases, sales, or allocation changes.
+              </p>
+            </article>
+          </section>
+
+          <section className="investo-section-stack">
+            <article className="investo-card">
+              <p className="investo-eyebrow">
+                Portfolio Review
+              </p>
+              <h2>Review the holdings already recorded.</h2>
+              <p>
+                Existing holdings remain the source of record.
+                Strategy classification is an additional management
+                layer.
+              </p>
+
+              <Link className="investo-pill" href="/v2/portfolio">
+                Review Portfolio
+              </Link>
+            </article>
+          </section>
+        </>
+      )}
     </InvestoProtectedPage>
   );
 }
